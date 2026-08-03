@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Board</title>
+  <link rel="stylesheet" href="../css/board.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+
+  <header class="navbar">
+
+    <div class="navigations">
+      <nav>
+        <a href="home.html">Home</a>
+        <a href="backlog.html">Backlog</a>
+        <a href="board.html">Board</a>
+      </nav>
+    </div>
+
+    <div class="nav_right">
+      <div>Aparna<b>Admin</b></div>
+      <div class="avatar">AK</div>
+    </div>
+
+  </header>
+
+  <main class="board-page">
+
+    <div class="board">
+
+      <section class="column column--todo">
+        <header class="column__header">
+          <span class="column__label">To Do</span>
+          <span class="column__count">1</span>
+        </header>
+
+        <ul class="column__list">
+          <li class="issue-card">
+            <span class="issue-card__type issue-card__type--bug" title="Bug">B</span>
+            <span class="issue-card__title">Coupon field rejects valid codes</span>
+            <span class="issue-card__footer">
+              <span class="issue-card__priority">High</span>
+              <span class="issue-card__assignee" title="Arjun Mehta">AM</span>
+            </span>
+          </li>
+
+        </ul>
+      </section>
+
+      <section class="column column--progress">
+        <header class="column__header">
+          <span class="column__label">In Progress</span>
+          <span class="column__count">0</span>
+        </header>
+      </section>
+
+      <section class="column column--review">
+        <header class="column__header">
+          <span class="column__label">In Review</span>
+          <span class="column__count">0</span>
+        </header>
+
+
+      </section>
+
+      <section class="column column--done">
+        <header class="column__header">
+          <span class="column__label">Done</span>
+          <span class="column__count">0</span>
+        </header>
+
+
+      </section>
+
+    </div>
+
+  </main>
+
+</body>
+
+</html>

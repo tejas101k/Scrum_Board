@@ -1,0 +1,225 @@
+$accent: #822f3e;
+$text: #201317;
+$muted: #8a7b7f;
+$bg: #faf7f3;
+$line: #e9dfde;
+$serif: "Fraunces", serif;
+$todo: #8b94a3;
+$progress: #c98a2e;
+$review: #5c7c99;
+$done: $accent;
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "Elms Sans", sans-serif;
+  background: $bg;
+  color: $text;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+  padding: 0 32px;
+  border-bottom: 1px solid $line;
+}
+
+.navigations a {
+  text-decoration: none;
+  color: $muted;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-right: 28px;
+
+  &:hover { color: $accent; }
+}
+
+.nav_right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+
+  b { color: $accent; font-size: 11px; margin-left: 6px; }
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: $accent;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 32px;
+}
+
+.backlog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+
+  h1 { font-family: $serif; font-size: 28px; margin-right: auto; }
+}
+
+.new-item {
+  position: relative;
+
+  summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid $accent;
+    color: $accent;
+  }
+
+  form {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 8px;
+    width: 280px;
+    background: #fff;
+    border: 1px solid $line;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1;
+  }
+
+  input, select, textarea {
+    font-family: inherit;
+    font-size: 13px;
+    padding: 8px 10px;
+    border: 1px solid $line;
+    border-radius: 6px;
+  }
+
+  button {
+    background: $accent;
+    color: #fff;
+    border: 0;
+    border-radius: 6px;
+    padding: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+  }
+}
+
+.sprint {
+  border: 1px solid $line;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+
+  summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 20px;
+    cursor: pointer;
+
+    > div { flex: 1; }
+  }
+
+  .no { 
+    font-family: $serif;
+    font-weight: 800; 
+    font-size: 24px; 
+    color: $accent; 
+  }
+  h2 {
+    font-family: $serif; 
+    font-size: 17px; 
+  }
+  p { 
+    font-size: 12px; 
+    color: $muted; 
+  }
+  em { font-style: normal; color: $accent; text-transform: uppercase; font-size: 11px; margin-right: 6px; }
+  .count { font-size: 12px; color: $muted; }
+
+  ul { list-style: none; border-top: 1px solid $line; }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    border-top: 1px solid $line;
+    font-size: 13px;
+
+  }
+
+  .tag {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    color: #fff;
+    font-family: $serif;
+    font-weight: 700;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &[data-type="task"] { background: $muted; }
+    &[data-type="bug"] { background: $accent; }
+    &[data-type="story"] { background: $progress; }
+  }
+
+  .title { flex: 1; font-weight: 600; }
+
+  select, input.points {
+    font-family: inherit;
+    font-size: 12px;
+    border: 1px solid $line;
+    border-radius: 5px;
+    padding: 4px 6px;
+  }
+
+  .priority { width: 85px; }
+  .who { width: 52px; text-align: center; color: $accent; font-weight: 700; }
+  input.points { width: 46px; text-align: center; }
+
+  .status {
+    width: 110px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 11px;
+
+    &[data-status="todo"] { color: $todo; }
+    &[data-status="progress"] { color: $progress; }
+    &[data-status="review"] { color: $review; }
+    &[data-status="done"] { color: $done; }
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar { padding: 0 16px; }
+  main { padding: 32px 16px; }
+
+  .new-item form { width: 100%; left: 0; }
+
+  .sprint li { flex-wrap: wrap; }
+  .title { flex: 1 0 100%; order: -1; }
+}

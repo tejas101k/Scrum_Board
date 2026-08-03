@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backlog</title>
+  <link rel="stylesheet" href="../css/backlog.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+
+  <header class="navbar">
+    <div class="navigations">
+      <nav>
+        <a href="home.html">Home</a>
+        <a href="backlog.html">Backlog</a>
+        <a href="board.html">Board</a>
+      </nav>
+    </div>
+
+    <div class="nav_right">
+      <div>Aparna<b>Admin</b></div>
+      <div class="avatar">AK</div>
+    </div>
+  </header>
+
+  <main>
+
+    <div class="backlog-header">
+      <h1>Backlog</h1>
+
+      <details class="new-item">
+        <summary>+ New sprint</summary>
+        <form>
+          <input type="text" placeholder="Sprint name" required>
+          <input type="date" required>
+          <input type="date" required>
+          <button type="submit">Create sprint</button>
+        </form>
+      </details>
+
+      <details class="new-item">
+        <summary>+ New issue</summary>
+        <form>
+          <input type="text" placeholder="Issue title" required>
+
+          <select>
+            <option value="task">Task</option>
+            <option value="bug">Bug</option>
+            <option value="story">Story</option>
+          </select>
+
+          <select>
+            <option value="">Priority</option>
+            <option value="Low">Low</option>
+            <option value="Normal">Normal</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="High">High</option>
+          </select>
+
+          <select>
+            <option value="">Unassigned</option>
+            <option value="PS">Priya Sharma</option>
+            <option value="AM">Arjun Mehta</option>
+            <option value="RK">Rhea Kapoor</option>
+          </select>
+
+          <select>
+            <option value="">State</option>
+            <option value="todo" selected>To Do</option>
+            <option value="progress">In Progress</option>
+            <option value="review">Review</option>
+            <option value="done">Done</option>
+          </select>
+
+          <select>
+            <option value="">Sprint</option>
+            <option value="todo" selected>sprint 1</option>
+            <option value="progress">sprint 2</option>
+          </select>
+
+          <input type="number" placeholder="Story points" min="0" step="1">
+
+          <button type="submit">Create issue</button>
+        </form>
+      </details>
+    </div>
+
+    <details class="sprint">
+      <summary>
+        <span class="no">13</span>
+        <div>
+          <h2>Login</h2>
+          <p><em>Active</em> 8 Aug - 15 Aug</p>
+        </div>
+        <span class="count">2 issues</span>
+      </summary>
+
+      <ul>
+        <li>
+          <span class="tag" data-type="story">S</span>
+          <span class="title">Design in-app notification center</span>
+          <select class="priority">
+            <option value="Low">Low</option>
+            <option value="Normal">Normal</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="High">High</option>
+          </select>
+          <select class="who">
+            <option value="PS">PS</option>
+            <option value="AM" selected>AM</option>
+            <option value="RK">RK</option>
+            <option value="">–</option>
+          </select>
+          <input type="number" class="points" value="8" min="0">
+          <select class="status" data-status="todo">
+            <option value="todo" selected>To Do</option>
+            <option value="progress">In Progress</option>
+            <option value="review">Review</option>
+            <option value="done">Done</option>
+          </select>
+          <select>
+            <option>Sprint</option>
+            <option>Sprint 1</option>
+            <option>Sprint 2</option>
+          </select>
+        </li>
+        <li>
+          <span class="tag" data-type="task">T</span>
+          <span class="title">Set up push notification service</span>
+          <select class="priority">
+            <option value="Low">Low</option>
+            <option value="Normal">Normal</option>
+            <option value="Medium">Medium</option>
+            <option value="High" selected>High</option>
+          </select>
+          <select class="who">
+            <option value="PS">PS</option>
+            <option value="AM">AM</option>
+            <option value="RK" selected>RK</option>
+            <option value="">–</option>
+          </select>
+          <input type="number" class="points" value="5" min="0">
+          <select class="status" data-status="progress">
+            <option value="todo">To Do</option>
+            <option value="progress" selected>In Progress</option>
+            <option value="review">Review</option>
+            <option value="done">Done</option>
+          </select>
+          <select>
+            <option>Sprint</option>
+            <option>Sprint 1</option>
+            <option>Sprint 2</option>
+          </select>
+        </li>
+      </ul>
+    </details>
+
+    <details class="sprint" open>
+      <summary>
+        <span class="no">–</span>
+        <div>
+          <h2>Backlog</h2>
+          <p>Not yet scheduled</p>
+        </div>
+        <span class="count">1 issues</span>
+      </summary>
+
+      <ul>
+        <li>
+          <span class="tag" data-type="task">T</span>
+          <span class="title">Migrate legacy invoice templates</span>
+          <select class="priority">
+            <option value="Low" selected>Low</option>
+            <option value="Normal">Normal</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+          <select class="who">
+            <option value="PS">PS</option>
+            <option value="AM">AM</option>
+            <option value="RK">RK</option>
+            <option value="" selected>–</option>
+          </select>
+          <input type="number" class="points" value="3" min="0">
+          <select class="status" data-status="todo">
+            <option value="todo" selected>To Do</option>
+            <option value="progress">In Progress</option>
+            <option value="review">Review</option>
+            <option value="done">Done</option>
+          </select>
+          <select>
+            <option>Sprint</option>
+            <option>Sprint 1</option>
+            <option>Sprint 2</option>
+          </select>
+        </li>
+
+      </ul>
+    </details>
+
+  </main>
+
+</body>
+
+</html>

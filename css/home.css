@@ -1,0 +1,136 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Elms Sans", sans-serif;
+  background: #faf7f3;
+  color: #201317;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+  padding: 0 32px;
+}
+
+.navigations a {
+  text-decoration: none;
+  color: #8a7b7f;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-right: 28px;
+}
+.navigations a:hover {
+  color: #822f3e;
+}
+
+.nav_right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+.nav_right b {
+  color: #822f3e;
+  font-size: 11px;
+  margin-left: 6px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #822f3e;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 32px;
+}
+
+.heading {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  color: #8a7b7f;
+  margin-bottom: 16px;
+}
+
+.sprint {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 28px;
+  border-top: 1px solid #e9dfde;
+  border-bottom: 1px solid #e9dfde;
+  padding-bottom: 28px;
+}
+
+.sprint_number {
+  font-family: "Fraunces", serif;
+  font-weight: 800;
+  font-size: 44px;
+  color: #822f3e;
+}
+
+h2 {
+  font-family: "Fraunces", serif;
+  font-size: 21px;
+  margin-bottom: 4px;
+}
+
+p {
+  font-size: 13px;
+  color: #8a7b7f;
+}
+
+em {
+  font-style: normal;
+  color: #822f3e;
+  text-transform: uppercase;
+  font-size: 11px;
+  margin-right: 6px;
+}
+
+.stats {
+  display: flex;
+}
+.stats div {
+  padding: 0 16px;
+  border-left: 1px solid #e9dfde;
+  text-align: center;
+  font-size: 11px;
+  color: #8a7b7f;
+  text-transform: uppercase;
+}
+.stats b {
+  display: block;
+  font-family: "Fraunces", serif;
+  font-size: 20px;
+  color: #201317;
+  text-transform: none;
+}
+
+@media (max-width: 640px) {
+  .sprint {
+    grid-template-columns: auto 1fr;
+  }
+  .stats {
+    grid-column: 1/-1;
+    flex-wrap: wrap;
+  }
+}
+
+/*# sourceMappingURL=home.css.map */

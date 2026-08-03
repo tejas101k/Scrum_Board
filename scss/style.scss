@@ -1,0 +1,144 @@
+$ink: #10233F;
+$ink-soft: #4B5A72;
+$ink-input: #A5AEBC;
+$accent: #822f3e;
+$page: #faf7f3;
+$card: #FFFFFF;
+$line: #DDE3EC;
+$error: #C0392B;
+
+$radius: 10px;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Elms Sans", "Inter", system-ui, sans-serif;
+  font-weight: 500;
+  background: $page;
+  font-size: medium;
+  color: $ink;
+  min-height: 100vh;
+}
+
+section {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 23rem;
+  margin: 0 auto;
+  text-align: left;
+  background: $card;
+  border: 1px solid $line;
+  border-radius: $radius;
+  padding: 2.75rem 2.25rem 2.25rem;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $ink;
+    margin-bottom: 0.25rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: $ink-soft;
+    margin-bottom: 2rem;
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  >div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+}
+
+label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: $ink-soft;
+}
+
+input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 0.9rem;
+  border: 1px solid $line;
+  border-radius: 8px;
+  background: $page;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: $ink;
+
+  &::placeholder {
+    color: $ink-input;
+    font-weight: 400;
+  }
+
+  &:hover {
+    border-color: darken($line, 50%);
+  }
+
+  &:focus {
+    outline: none;
+    background-color: $card;
+  }
+
+  // &:invalid:not(:placeholder-shown) {
+  //   border-color: $error;
+  // }
+
+}
+
+button {
+  min-width: 10rem;
+  min-height: 3rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  background-color: $accent;
+  color: $card;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken($accent, 6%);
+  }
+
+}
+
+@media (max-width: 400px) {
+  .login-card {
+    padding: 2.25rem 1.5rem 1.75rem;
+  }
+
+  button {
+    min-width: 100%;
+  }
+}

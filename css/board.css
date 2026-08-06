@@ -10,6 +10,10 @@ body {
   color: #201317;
 }
 
+html {
+  overflow-y: scroll;
+}
+
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -28,6 +32,9 @@ body {
   margin-right: 28px;
 }
 .navigations a:hover {
+  color: #822f3e;
+}
+.navigations a.active {
   color: #822f3e;
 }
 
@@ -56,10 +63,10 @@ body {
   justify-content: center;
 }
 
-.board-page {
+main {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 36px 32px;
+  padding: 36px 32px 48px;
 }
 
 .board {
@@ -68,7 +75,7 @@ body {
   gap: 20px;
 }
 
-.column__header {
+.col h2 {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
@@ -79,51 +86,47 @@ body {
   margin-bottom: 12px;
   border-bottom: 2px solid #e9dfde;
 }
-.column__header .column__count {
-  font-family: "Fraunces", serif;
+.col h2 span {
+  font-weight: 700;
   font-size: 14px;
 }
 
-.column--todo .column__header {
+.col[data-status=todo] h2 {
   border-color: #8b94a3;
 }
-.column--todo .column__header .column__count {
+.col[data-status=todo] h2 span {
   color: #8b94a3;
 }
 
-.column--progress .column__header {
+.col[data-status=progress] h2 {
   border-color: #c98a2e;
 }
-.column--progress .column__header .column__count {
+.col[data-status=progress] h2 span {
   color: #c98a2e;
 }
 
-.column--review .column__header {
+.col[data-status=review] h2 {
   border-color: #5c7c99;
 }
-.column--review .column__header .column__count {
+.col[data-status=review] h2 span {
   color: #5c7c99;
 }
 
-.column--done .column__header {
+.col[data-status=done] h2 {
   border-color: #822f3e;
 }
-.column--done .column__header .column__count {
+.col[data-status=done] h2 span {
   color: #822f3e;
 }
 
-.column__list {
-  list-style: none;
-}
-
-.issue-card {
+.card {
   background: #fff;
   border: 1px solid #e9dfde;
   border-radius: 7px;
   padding: 10px 12px;
   margin-bottom: 10px;
 }
-.issue-card__type {
+.card .tag {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -131,43 +134,70 @@ body {
   height: 18px;
   border-radius: 4px;
   color: #fff;
-  font-family: "Fraunces", serif;
   font-weight: 700;
   font-size: 10px;
   margin-bottom: 6px;
 }
-.issue-card__type--task {
+.card[data-type=task] .tag {
   background: #8a7b7f;
 }
-.issue-card__type--bug {
+.card[data-type=bug] .tag {
   background: #822f3e;
 }
-.issue-card__type--story {
+.card[data-type=story] .tag {
   background: #c98a2e;
 }
-.issue-card__title {
-  display: block;
-  font-family: "Fraunces", serif;
+.card p {
   font-weight: 600;
   font-size: 13px;
   line-height: 1.3;
 }
-.issue-card__footer {
+
+.card select.status {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  height: 28px;
+  padding: 0 6px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 1px solid #e9dfde;
+  border-radius: 5px;
+}
+.card select.status[data-status=todo] {
+  color: #8b94a3;
+}
+.card select.status[data-status=progress] {
+  color: #c98a2e;
+}
+.card select.status[data-status=review] {
+  color: #5c7c99;
+}
+.card select.status[data-status=done] {
+  color: #822f3e;
+}
+
+.card-foot {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 8px;
+}
+.card-foot span:first-child {
   font-size: 11px;
   color: #8a7b7f;
 }
-.issue-card__assignee {
-  width: 20px;
-  height: 20px;
+
+.who-badge {
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: rgba(130, 47, 62, 0.1);
   color: #822f3e;
-  font-weight: 700;
   font-size: 10px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -182,11 +212,19 @@ body {
   .navbar {
     padding: 0 16px;
   }
-  .board-page {
+  main {
     padding: 24px 16px;
   }
   .board {
     grid-template-columns: 1fr;
+  }
+  .sprint-head {
+    flex-wrap: wrap;
+  }
+  .sprint-head div {
+    flex: 1 0 100%;
+    border: 0;
+    padding: 8px 0 0;
   }
 }
 

@@ -10,12 +10,17 @@ body {
   color: #201317;
 }
 
+html {
+  overflow-y: scroll;
+}
+
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 64px;
   padding: 0 32px;
+  border-bottom: 1px solid #e9dfde;
 }
 
 .navigations a {
@@ -27,6 +32,9 @@ body {
   margin-right: 28px;
 }
 .navigations a:hover {
+  color: #822f3e;
+}
+.navigations a.active {
   color: #822f3e;
 }
 
@@ -47,7 +55,7 @@ body {
   height: 32px;
   border-radius: 50%;
   background: #822f3e;
-  color: white;
+  color: #fff;
   font-size: 11px;
   font-weight: 700;
   display: flex;
@@ -62,32 +70,46 @@ main {
 }
 
 .heading {
-  font-family: "Fraunces", serif;
-  font-style: italic;
+  font-size: 14px;
+  font-weight: 700;
   color: #8a7b7f;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   margin-bottom: 16px;
 }
 
-.sprint {
+.sprints {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 28px;
+  align-items: start;
+  gap: 24px 28px;
   border-top: 1px solid #e9dfde;
+}
+.sprints > *:not(:nth-last-child(-n+3)) {
+  padding-bottom: 24px;
   border-bottom: 1px solid #e9dfde;
-  padding-bottom: 28px;
 }
 
 .sprint_number {
-  font-family: "Fraunces", serif;
-  font-weight: 800;
-  font-size: 44px;
+  font-weight: 700;
+  font-size: 32px;
   color: #822f3e;
+  padding-top: 2px;
+  text-align: center;
+}
+.sprint_number span {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #8a7b7f;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
 }
 
 h2 {
-  font-family: "Fraunces", serif;
-  font-size: 21px;
+  font-size: 17px;
+  font-weight: 700;
   margin-bottom: 4px;
 }
 
@@ -96,9 +118,15 @@ p {
   color: #8a7b7f;
 }
 
+.goal {
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
 em {
   font-style: normal;
   color: #822f3e;
+  font-weight: 700;
   text-transform: uppercase;
   font-size: 11px;
   margin-right: 6px;
@@ -106,6 +134,7 @@ em {
 
 .stats {
   display: flex;
+  padding-top: 2px;
 }
 .stats div {
   padding: 0 16px;
@@ -115,22 +144,16 @@ em {
   color: #8a7b7f;
   text-transform: uppercase;
 }
+.stats div:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
 .stats b {
   display: block;
-  font-family: "Fraunces", serif;
-  font-size: 20px;
+  font-size: 18px;
+  font-weight: 700;
   color: #201317;
   text-transform: none;
-}
-
-@media (max-width: 640px) {
-  .sprint {
-    grid-template-columns: auto 1fr;
-  }
-  .stats {
-    grid-column: 1/-1;
-    flex-wrap: wrap;
-  }
 }
 
 /*# sourceMappingURL=home.css.map */

@@ -3,18 +3,17 @@ $text: #201317;
 $muted: #8a7b7f;
 $bg: #faf7f3;
 $line: #e9dfde;
-$serif: "Fraunces", serif;
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: "Elms Sans", sans-serif;
   background: $bg;
   color: $text;
+}
+
+html {
+  overflow-y: scroll;
 }
 
 .navbar {
@@ -23,20 +22,20 @@ body {
   align-items: center;
   height: 64px;
   padding: 0 32px;
+  border-bottom: 1px solid $line;
 }
 
-.navigations {
-  a {
-    text-decoration: none;
-    color: $muted;
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    margin-right: 28px;
+.navigations a {
+  text-decoration: none;
+  color: $muted;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-right: 28px;
 
-    &:hover {
-      color: $accent;
-    }
+  &:hover { color: $accent; }
+  &.active {
+    color: $accent;
   }
 }
 
@@ -46,11 +45,7 @@ body {
   gap: 12px;
   font-size: 13px;
 
-  b {
-    color: $accent;
-    font-size: 11px;
-    margin-left: 6px;
-  }
+  b { color: $accent; font-size: 11px; margin-left: 6px; }
 }
 
 .avatar {
@@ -58,7 +53,7 @@ body {
   height: 32px;
   border-radius: 50%;
   background: $accent;
-  color: #ffff;
+  color: #fff;
   font-size: 11px;
   font-weight: 700;
   display: flex;
@@ -73,43 +68,57 @@ main {
 }
 
 .heading {
-  font-family: $serif;
-  font-style: italic;
+  font-size: 14px;
+  font-weight: 700;
   color: $muted;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   margin-bottom: 16px;
 }
 
-.sprint {
+.sprints {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 28px;
+  align-items: start;
+  gap: 24px 28px;
   border-top: 1px solid $line;
-  border-bottom: 1px solid $line;
-  padding-bottom: 28px;
+
+  > *:not(:nth-last-child(-n + 3)) {
+    padding-bottom: 24px;
+    border-bottom: 1px solid $line;
+  }
 }
 
 .sprint_number {
-  font-family: $serif;
-  font-weight: 800;
-  font-size: 44px;
+  font-weight: 700;
+  font-size: 32px;
   color: $accent;
+  padding-top: 2px;
+  text-align: center;
+
+  span {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    color: $muted;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 2px;
+  }
 }
 
-h2 {
-  font-family: $serif;
-  font-size: 21px;
-  margin-bottom: 4px;
-}
+h2 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+p { font-size: 13px; color: $muted; }
 
-p {
-  font-size: 13px;
-  color: $muted;
+.goal {
+  margin-top: 6px;
+  line-height: 1.5;
 }
 
 em {
   font-style: normal;
   color: $accent;
+  font-weight: 700;
   text-transform: uppercase;
   font-size: 11px;
   margin-right: 6px;
@@ -117,6 +126,7 @@ em {
 
 .stats {
   display: flex;
+  padding-top: 2px;
 
   div {
     padding: 0 16px;
@@ -125,24 +135,15 @@ em {
     font-size: 11px;
     color: $muted;
     text-transform: uppercase;
+
+    &:first-child { border-left: 0; padding-left: 0; }
   }
 
   b {
     display: block;
-    font-family: $serif;
-    font-size: 20px;
+    font-size: 18px;
+    font-weight: 700;
     color: $text;
     text-transform: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .sprint {
-    grid-template-columns: auto 1fr;
-  }
-
-  .stats {
-    grid-column: 1 / -1;
-    flex-wrap: wrap;
   }
 }

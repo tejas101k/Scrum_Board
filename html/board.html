@@ -4,24 +4,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Board</title>
+  <title>Board · Elms</title>
   <link rel="stylesheet" href="../css/board.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
   <header class="navbar">
-
     <div class="navigations">
       <nav>
         <a href="home.html">Home</a>
         <a href="backlog.html">Backlog</a>
-        <a href="board.html">Board</a>
+        <a href="board.html" class="active">Board</a>
       </nav>
     </div>
 
@@ -29,56 +26,159 @@
       <div>Aparna<b>Admin</b></div>
       <div class="avatar">AK</div>
     </div>
-
   </header>
 
-  <main class="board-page">
+  <main>
 
     <div class="board">
 
-      <section class="column column--todo">
-        <header class="column__header">
-          <span class="column__label">To Do</span>
-          <span class="column__count">1</span>
-        </header>
+      <div class="col" data-status="todo">
+        <h2>To Do <span>15</span></h2>
 
-        <ul class="column__list">
-          <li class="issue-card">
-            <span class="issue-card__type issue-card__type--bug" title="Bug">B</span>
-            <span class="issue-card__title">Coupon field rejects valid codes</span>
-            <span class="issue-card__footer">
-              <span class="issue-card__priority">High</span>
-              <span class="issue-card__assignee" title="Arjun Mehta">AM</span>
-            </span>
-          </li>
+        <div class="card" data-type="bug">
+          <span class="tag">B</span>
+          <p>Coupon field rejects valid codes</p>
+          <select class="status" data-status="todo">
+            <option value="todo" selected>To Do</option>
+            <option value="progress">In Progress</option>
+            <option value="review">In Review</option>
+            <option value="done">Done</option>
+          </select>
+          <div class="card-foot"><span>High</span><span class="who-badge">AM</span></div>
+        </div>
 
-        </ul>
-      </section>
+        <div class="card" data-type="task">
+          <span class="tag">T</span>
+          <p>Write checkout QA checklist</p>
+          <select class="status" data-status="todo">
+            <option value="todo" selected>To Do</option>
+            <option value="progress">In Progress</option>
+            <option value="review">In Review</option>
+            <option value="done">Done</option>
+          </select>
+          <div class="card-foot"><span>Low</span><span class="who-badge">RK</span></div>
+        </div>
 
-      <section class="column column--progress">
-        <header class="column__header">
-          <span class="column__label">In Progress</span>
-          <span class="column__count">0</span>
-        </header>
-      </section>
+        <div class="card" data-type="story">
+          <span class="tag">S</span>
+          <p>Add express checkout for returning users</p>
+          <select class="status" data-status="todo">
+            <option value="todo" selected>To Do</option>
+            <option value="progress">In Progress</option>
+            <option value="review">In Review</option>
+            <option value="done">Done</option>
+          </select>
+          <div class="card-foot"><span>Medium</span><span class="who-badge">–</span></div>
+        </div>
 
-      <section class="column column--review">
-        <header class="column__header">
-          <span class="column__label">In Review</span>
-          <span class="column__count">0</span>
-        </header>
+        <div class="card" data-type="task">
+          <span class="tag">T</span>
+          <p>Localise currency formatting</p>
+          <select class="status" data-status="todo">
+            <option value="todo" selected>To Do</option>
+            <option value="progress">In Progress</option>
+            <option value="review">In Review</option>
+            <option value="done">Done</option>
+          </select>
+          <div class="card-foot"><span>Medium</span><span class="who-badge">PS</span></div>
+        </div>
+      </div>
 
+      <div class="col" data-status="progress">
+        <h2>In Progress <span>8</span></h2>
 
-      </section>
+        <div class="card" data-type="story">
+          <span class="tag">S</span>
+          <p>Redesign payment step layout</p>
+          <select class="status" data-status="progress">
+            <option value="todo">To Do</option>
+            <option value="progress" selected>In Progress</option>
+            <option value="review">In Review</option>
+            <option value="done">Done</option>
+          </select>
+          <div class="card-foot"><span>High</span><span class="who-badge">PS</span></div>
+        </div>
 
-      <section class="column column--done">
-        <header class="column__header">
-          <span class="column__label">Done</span>
-          <span class="column__count">0</span>
-        </header>
+        <div class="card" data-type="task">
+          <span class="tag">T</span>
+          <p>Wire UPI payment gateway</p>
+          <select class="status" data-status="progress">
+            <option value="todo">To Do</option>
+            <option value="progress" selected>In Progress</option>
+            <option value="review">In Review</option>
+            <option value="done">Done</option>
+          </select>
+          <div class="card-foot"><span>High</span><span class="who-badge">RK</span></div>
+        </div>
+      </div>
 
+      <div class="col" data-status="review">
+        <h2>In Review <span>4</span></h2>
 
-      </section>
+        <div class="card" data-type="bug">
+          <span class="tag">B</span>
+          <p>Cart total rounds down by 1 paisa</p>
+          <select class="status" data-status="review">
+            <option value="todo">To Do</option>
+            <option value="progress">In Progress</option>
+            <option value="review" selected>In Review</option>
+            <option value="done">Done</option>
+          </select>
+          <div class="card-foot"><span>Medium</span><span class="who-badge">AM</span></div>
+        </div>
+
+        <div class="card" data-type="task">
+          <span class="tag">T</span>
+          <p>Add retry logic for failed payments</p>
+          <select class="status" data-status="review">
+            <option value="todo">To Do</option>
+            <option value="progress">In Progress</option>
+            <option value="review" selected>In Review</option>
+            <option value="done">Done</option>
+          </select>
+          <div class="card-foot"><span>High</span><span class="who-badge">PS</span></div>
+        </div>
+      </div>
+
+      <div class="col" data-status="done">
+        <h2>Done <span>15</span></h2>
+
+        <div class="card" data-type="task">
+          <span class="tag">T</span>
+          <p>Add saved-address autofill</p>
+          <select class="status" data-status="done">
+            <option value="todo">To Do</option>
+            <option value="progress">In Progress</option>
+            <option value="review">In Review</option>
+            <option value="done" selected>Done</option>
+          </select>
+          <div class="card-foot"><span>Medium</span><span class="who-badge">PS</span></div>
+        </div>
+
+        <div class="card" data-type="story">
+          <span class="tag">S</span>
+          <p>Simplify shipping address form</p>
+          <select class="status" data-status="done">
+            <option value="todo">To Do</option>
+            <option value="progress">In Progress</option>
+            <option value="review">In Review</option>
+            <option value="done" selected>Done</option>
+          </select>
+          <div class="card-foot"><span>Medium</span><span class="who-badge">RK</span></div>
+        </div>
+
+        <div class="card" data-type="bug">
+          <span class="tag">B</span>
+          <p>Guest checkout skips email validation</p>
+          <select class="status" data-status="done">
+            <option value="todo">To Do</option>
+            <option value="progress">In Progress</option>
+            <option value="review">In Review</option>
+            <option value="done" selected>Done</option>
+          </select>
+          <div class="card-foot"><span>High</span><span class="who-badge">AM</span></div>
+        </div>
+      </div>
 
     </div>
 

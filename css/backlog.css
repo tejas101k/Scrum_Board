@@ -10,6 +10,10 @@ body {
   color: #201317;
 }
 
+html {
+  overflow-y: scroll;
+}
+
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -28,6 +32,9 @@ body {
   margin-right: 28px;
 }
 .navigations a:hover {
+  color: #822f3e;
+}
+.navigations a.active {
   color: #822f3e;
 }
 
@@ -65,13 +72,9 @@ main {
 .backlog-header {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 12px;
   margin-bottom: 24px;
-}
-.backlog-header h1 {
-  font-family: "Fraunces", serif;
-  font-size: 28px;
-  margin-right: auto;
 }
 
 .new-item {
@@ -84,8 +87,9 @@ main {
   border-radius: 6px;
   font-size: 13px;
   font-weight: 700;
+  background: #822f3e;
+  color: #fff;
   border: 1px solid #822f3e;
-  color: #822f3e;
 }
 .new-item form {
   position: absolute;
@@ -120,6 +124,40 @@ main {
   cursor: pointer;
 }
 
+.legend {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: #8a7b7f;
+}
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend i {
+  font-style: normal;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.legend i[data-type=task] {
+  background: #8a7b7f;
+}
+.legend i[data-type=bug] {
+  background: #822f3e;
+}
+.legend i[data-type=story] {
+  background: #c98a2e;
+}
+
 .sprint {
   border: 1px solid #e9dfde;
   border-radius: 8px;
@@ -138,14 +176,13 @@ main {
   flex: 1;
 }
 .sprint .no {
-  font-family: "Fraunces", serif;
-  font-weight: 800;
-  font-size: 24px;
+  font-weight: 700;
+  font-size: 20px;
   color: #822f3e;
 }
 .sprint h2 {
-  font-family: "Fraunces", serif;
-  font-size: 17px;
+  font-size: 16px;
+  font-weight: 700;
 }
 .sprint p {
   font-size: 12px;
@@ -154,6 +191,7 @@ main {
 .sprint em {
   font-style: normal;
   color: #822f3e;
+  font-weight: 700;
   text-transform: uppercase;
   font-size: 11px;
   margin-right: 6px;
@@ -161,6 +199,10 @@ main {
 .sprint .count {
   font-size: 12px;
   color: #8a7b7f;
+}
+.sprint .goal {
+  margin-top: 4px;
+  line-height: 1.5;
 }
 .sprint ul {
   list-style: none;
@@ -174,12 +216,14 @@ main {
   border-top: 1px solid #e9dfde;
   font-size: 13px;
 }
+.sprint li:first-child {
+  border-top: 0;
+}
 .sprint .tag {
   width: 20px;
   height: 20px;
   border-radius: 4px;
   color: #fff;
-  font-family: "Fraunces", serif;
   font-weight: 700;
   font-size: 10px;
   display: flex;
@@ -202,9 +246,14 @@ main {
 .sprint select, .sprint input.points {
   font-family: inherit;
   font-size: 12px;
+  height: 30px;
   border: 1px solid #e9dfde;
   border-radius: 5px;
-  padding: 4px 6px;
+  padding: 0 6px;
+  vertical-align: middle;
+}
+.sprint li select.issue-sprint {
+  width: 90px;
 }
 .sprint .priority {
   width: 85px;

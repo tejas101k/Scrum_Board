@@ -83,7 +83,7 @@ input::placeholder {
   font-weight: 400;
 }
 input:hover {
-  border-color: rgb(28.3980762116%, 37.3658897521%, 50.8176100629%);
+  border-color: rgb(72.4150943396, 95.2830188679, 129.5849056604);
 }
 input:focus {
   outline: none;
@@ -106,7 +106,7 @@ button {
   cursor: pointer;
 }
 button:hover {
-  background-color: rgb(42.1668328348%, 15.2449318711%, 20.1103356597%);
+  background-color: rgb(107.5254237288, 38.8745762712, 51.2813559322);
 }
 
 @media (max-width: 400px) {

@@ -28,7 +28,25 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Redirect to home
-    window.location.href = 'html/home.html';
+    // Submit credentials to login
+    fetch('/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    })
+    .then(async (res) => {
+      if (res.ok) {
+        window.location.href = 'html/home.html';
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        errorMessage.textContent = errData.error || 'Invalid email or password.';
+      }
+    })
+    .catch((err) => {
+      console.error('Login error:', err);
+      errorMessage.textContent = 'A network error occurred. Please try again.';
+    });
   });
 });

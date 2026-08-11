@@ -104,15 +104,14 @@ async function startServer() {
   try {
     const res = await pool.query('SELECT NOW()');
     console.log(`Database connected: ${res.rows[0].now}`);
-
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-    });
   } catch (err) {
-    console.error('Database connection failed:', err.message);
-    process.exit(1);
+    console.error('Database connection failed on startup:', err.message);
   }
+
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
 }
 
 startServer();

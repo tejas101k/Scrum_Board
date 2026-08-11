@@ -105,6 +105,12 @@ main {
     gap: 20px;
     padding: 16px 20px;
     cursor: pointer;
+    background: #fff;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background: #fafaf9;
+    }
 
     > div { flex: 1; }
   }
@@ -125,8 +131,14 @@ main {
     padding: 10px 20px;
     border-top: 1px solid $line;
     font-size: 13px;
+    background: #fff;
+    transition: background-color 0.15s ease;
 
     &:first-child { border-top: 0; }
+
+    &:hover {
+      background: #faf9f8;
+    }
   }
 
   .tag {

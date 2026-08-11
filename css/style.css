@@ -77,17 +77,20 @@ input {
   font-size: 0.9rem;
   font-weight: 500;
   color: #10233F;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 input::placeholder {
   color: #A5AEBC;
   font-weight: 400;
 }
 input:hover {
-  border-color: rgb(28.3980762116%, 37.3658897521%, 50.8176100629%);
+  border-color: rgb(61.0062893082%, 67.8875323714%, 78.2093969663%);
 }
 input:focus {
   outline: none;
   background-color: #FFFFFF;
+  border-color: #822f3e;
+  box-shadow: 0 0 0 4px rgba(130, 47, 62, 0.1);
 }
 
 button {
@@ -104,9 +107,14 @@ button {
   font-weight: 700;
   letter-spacing: 0.01em;
   cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
 button:hover {
   background-color: rgb(42.1668328348%, 15.2449318711%, 20.1103356597%);
+  box-shadow: 0 4px 12px rgba(130, 47, 62, 0.2);
+}
+button:active {
+  transform: scale(0.98);
 }
 
 @media (max-width: 400px) {

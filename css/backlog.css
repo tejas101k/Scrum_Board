@@ -275,6 +275,11 @@ main {
   gap: 20px;
   padding: 16px 20px;
   cursor: pointer;
+  background: #fff;
+  transition: background-color 0.15s ease;
+}
+.sprint summary:hover {
+  background: #fafaf9;
 }
 .sprint summary > div {
   flex: 1;
@@ -319,9 +324,14 @@ main {
   padding: 10px 20px;
   border-top: 1px solid #e9dfde;
   font-size: 13px;
+  background: #fff;
+  transition: background-color 0.15s ease;
 }
 .sprint li:first-child {
   border-top: 0;
+}
+.sprint li:hover {
+  background: #faf9f8;
 }
 .sprint .tag {
   width: 20px;

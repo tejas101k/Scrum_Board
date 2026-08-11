@@ -21,6 +21,7 @@ main {
   align-items: start;
   gap: 24px 28px;
   border-top: 1px solid $line;
+  padding-top: 24px;
 
   > *:not(:nth-last-child(-n + 3)) {
     padding-bottom: 24px;
@@ -128,10 +129,25 @@ em {
   .sprints {
     grid-template-columns: auto 1fr;
     gap: 16px 20px;
+    padding-top: 16px;
 
     > *:not(:nth-last-child(-n + 3)) {
       padding-bottom: 0;
       border-bottom: none;
+    }
+
+    .sprint_number {
+      background: rgba($accent, 0.05);
+      border: 1px dashed rgba($accent, 0.2);
+      border-radius: 12px;
+      padding: 10px 14px;
+      min-width: 68px;
+      height: fit-content;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      align-self: start;
     }
 
     .stats {
@@ -146,16 +162,23 @@ em {
       padding-top: 8px;
 
       div {
-        padding: 8px 12px;
+        padding: 10px 12px;
         background: #fdfcfb;
         border: 1px solid $line;
-        border-radius: 8px;
+        border-radius: 10px;
         text-align: center;
         border-left: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 
         &:first-child {
           padding-left: 12px;
         }
+
+        // Color stats numbers to match backlog/board column themes perfectly
+        &:nth-child(1) b { color: $text; }
+        &:nth-child(2) b { color: darken(#8b94a3, 10%); } // To do
+        &:nth-child(3) b { color: darken(#c98a2e, 10%); } // In progress
+        &:nth-child(4) b { color: $accent; } // Done
       }
     }
 
@@ -171,10 +194,27 @@ em {
 
   .goal-details {
     summary {
-      display: flex;
+      display: inline-flex;
+      font-size: 11px;
+      font-weight: 700;
+      color: $muted;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: rgba($line, 0.45);
+      padding: 4px 10px;
+      border-radius: 100px;
+      width: fit-content;
+      margin-top: 10px;
+      transition: background-color 0.15s ease, color 0.15s ease;
+
+      &:hover {
+        background: rgba($accent, 0.08);
+        color: $accent;
+      }
     }
     
     p.goal {
+      margin-top: 8px;
       padding-left: 14px;
       border-left: 2px solid $line;
     }

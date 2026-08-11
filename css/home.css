@@ -189,6 +189,7 @@ main {
   align-items: start;
   gap: 24px 28px;
   border-top: 1px solid #e9dfde;
+  padding-top: 24px;
 }
 .sprints > *:not(:nth-last-child(-n+3)) {
   padding-bottom: 24px;
@@ -295,10 +296,24 @@ em {
   .sprints {
     grid-template-columns: auto 1fr;
     gap: 16px 20px;
+    padding-top: 16px;
   }
   .sprints > *:not(:nth-last-child(-n+3)) {
     padding-bottom: 0;
     border-bottom: none;
+  }
+  .sprints .sprint_number {
+    background: rgba(130, 47, 62, 0.05);
+    border: 1px dashed rgba(130, 47, 62, 0.2);
+    border-radius: 12px;
+    padding: 10px 14px;
+    min-width: 68px;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-self: start;
   }
   .sprints .stats {
     grid-column: 1/-1;
@@ -311,15 +326,28 @@ em {
     padding-top: 8px;
   }
   .sprints .stats div {
-    padding: 8px 12px;
+    padding: 10px 12px;
     background: #fdfcfb;
     border: 1px solid #e9dfde;
-    border-radius: 8px;
+    border-radius: 10px;
     text-align: center;
     border-left: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   }
   .sprints .stats div:first-child {
     padding-left: 12px;
+  }
+  .sprints .stats div:nth-child(1) b {
+    color: #201317;
+  }
+  .sprints .stats div:nth-child(2) b {
+    color: rgb(43.5369532428%, 47.7960030166%, 54.8944193062%);
+  }
+  .sprints .stats div:nth-child(3) b {
+    color: rgb(62.548225768%, 42.94355799%, 14.31451933%);
+  }
+  .sprints .stats div:nth-child(4) b {
+    color: #822f3e;
   }
   .sprints > *:nth-last-child(-n+3).stats {
     border-bottom: none;
@@ -327,9 +355,25 @@ em {
     margin-bottom: 0;
   }
   .goal-details summary {
-    display: flex;
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: 700;
+    color: #8a7b7f;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: rgba(233, 223, 222, 0.45);
+    padding: 4px 10px;
+    border-radius: 100px;
+    width: fit-content;
+    margin-top: 10px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .goal-details summary:hover {
+    background: rgba(130, 47, 62, 0.08);
+    color: #822f3e;
   }
   .goal-details p.goal {
+    margin-top: 8px;
     padding-left: 14px;
     border-left: 2px solid #e9dfde;
   }

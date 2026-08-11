@@ -91,6 +91,7 @@ input {
   font-size: 0.9rem;
   font-weight: 500;
   color: $ink;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 
   &::placeholder {
     color: $ink-input;
@@ -98,12 +99,14 @@ input {
   }
 
   &:hover {
-    border-color: darken($line, 50%);
+    border-color: darken($line, 20%);
   }
 
   &:focus {
     outline: none;
     background-color: $card;
+    border-color: $accent;
+    box-shadow: 0 0 0 4px rgba($accent, 0.1);
   }
 
   // &:invalid:not(:placeholder-shown) {
@@ -126,11 +129,16 @@ button {
   font-weight: 700;
   letter-spacing: 0.01em;
   cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 
   &:hover {
     background-color: darken($accent, 6%);
+    box-shadow: 0 4px 12px rgba($accent, 0.2);
   }
 
+  &:active {
+    transform: scale(0.98);
+  }
 }
 
 @media (max-width: 400px) {

@@ -61,4 +61,10 @@
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Collapse sprint descriptions on mobile devices
+  if (window.innerWidth <= 640) {
+    document.querySelectorAll('.goal-details').forEach(details => {
+      details.removeAttribute('open');
+    });
+  }
 });

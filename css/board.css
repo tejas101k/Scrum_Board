@@ -21,6 +21,13 @@ html {
   height: 64px;
   padding: 0 32px;
   border-bottom: 1px solid #e9dfde;
+  flex-wrap: nowrap;
+}
+
+.navigations nav {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
 }
 
 .navigations a {
@@ -30,6 +37,10 @@ html {
   font-weight: 700;
   text-transform: uppercase;
   margin-right: 28px;
+  white-space: nowrap;
+}
+.navigations a:last-child {
+  margin-right: 0;
 }
 .navigations a:hover {
   color: #822f3e;
@@ -43,6 +54,7 @@ html {
   align-items: center;
   gap: 12px;
   font-size: 13px;
+  flex-shrink: 0;
 }
 .nav_right b {
   color: #822f3e;
@@ -61,8 +73,32 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
+@media (max-width: 640px) {
+  .navbar {
+    padding: 0 16px;
+  }
+  .navigations a {
+    margin-right: 16px;
+  }
+}
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0 12px;
+  }
+  .navigations a {
+    margin-right: 10px;
+    font-size: 12px;
+  }
+  .nav_right {
+    gap: 8px;
+  }
+  .nav_right > div:not(.avatar) {
+    display: none;
+  }
+}
 main {
   max-width: 1200px;
   margin: 0 auto;

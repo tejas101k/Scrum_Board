@@ -78,7 +78,8 @@ app.post('/auth/login', async (req, res) => {
     req.session.user = {
       id: user.id,
       name: user.name,
-      initials: user.initials
+      initials: user.initials,
+      email: user.email
     };
 
     res.json(req.session.user);

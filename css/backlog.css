@@ -55,6 +55,7 @@ html {
   gap: 12px;
   font-size: 13px;
   flex-shrink: 0;
+  position: relative;
 }
 .nav_right b {
   color: #822f3e;
@@ -76,6 +77,68 @@ html {
   flex-shrink: 0;
 }
 
+.profile-popup {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  width: 260px;
+  background: #ffffff;
+  border: 1px solid #e9dfde;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1000;
+  text-align: center;
+  cursor: default;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.profile-popup.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.profile-popup .avatar.large {
+  width: 64px;
+  height: 64px;
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+.profile-popup .profile-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #201317;
+  margin-bottom: 4px;
+  text-transform: none;
+}
+.profile-popup .profile-email {
+  font-size: 13px;
+  color: #8a7b7f;
+  margin-bottom: 20px;
+  word-break: break-all;
+  text-transform: none;
+}
+.profile-popup .logout-btn {
+  width: 100%;
+  padding: 10px;
+  background: #822f3e;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.profile-popup .logout-btn:hover {
+  background: rgb(39.2289797275%, 14.1827849784%, 18.7092057162%);
+}
+
 @media (max-width: 640px) {
   .navbar {
     padding: 0 16px;
@@ -95,8 +158,13 @@ html {
   .nav_right {
     gap: 8px;
   }
-  .nav_right > div:not(.avatar) {
-    display: none;
+  .nav_right .user-name {
+    display: inline-block;
+    max-width: 65px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
   }
 }
 main {

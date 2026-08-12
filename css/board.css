@@ -342,4 +342,64 @@ main {
   }
 }
 
+.card.dragging {
+  opacity: 0.4;
+}
+.col.drag-over {
+  background-color: #f5eceb !important;
+  border: 2px dashed #c9a4a1;
+  border-radius: 8px;
+}
+.card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.card .delete-btn {
+  background: none;
+  border: none;
+  color: #822f3e;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+.card .delete-btn:hover {
+  opacity: 0.7;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  font-family: inherit;
+}
+.user-meta .user-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: #822f3e;
+}
+.user-meta .user-role {
+  font-size: 10px;
+  color: #7f8c8d;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.profile-popup .profile-role {
+  font-size: 11px;
+  color: #822f3e;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  text-align: center;
+}
+.profile-popup .profile-email {
+  margin-bottom: 12px;
+  text-align: center;
+}
+
 /*# sourceMappingURL=board.css.map */

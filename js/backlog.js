@@ -1,72 +1,3 @@
-// Check if user is logged in
-(function() {
-  fetch('/auth/me')
-    .then(res => {
-      if (!res.ok) {
-        window.location.href = '../index.html';
-        return;
-      }
-      return res.json();
-    })
-    .then(user => {
-      if (!user) return;
-      
-      // Update navbar with user info
-      const navRight = document.querySelector('.nav_right');
-      if (navRight) {
-        navRight.style.display = 'flex';
-        navRight.style.alignItems = 'center';
-        navRight.style.gap = '10px';
-        navRight.innerHTML = `
-          <div class="user-meta" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; font-family: inherit;">
-            <span class="user-name" style="font-weight: 700; font-size: 13px; color: #822f3e;">${user.name}</span>
-            <span class="user-role" style="font-size: 10px; color: #7f8c8d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">${user.role || 'Admin'}</span>
-          </div>
-          <div class="avatar">${user.initials}</div>
-          <div class="profile-popup">
-            <div class="avatar large">${user.initials}</div>
-            <div class="profile-name">${user.name}</div>
-            <div class="profile-role" style="font-size: 11px; color: #822f3e; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">${user.role || 'Admin'}</div>
-            <div class="profile-email" style="margin-bottom: 12px;">${user.email || ''}</div>
-            <button class="logout-btn">Log Out</button>
-          </div>
-        `;
-        
-        navRight.style.cursor = 'pointer';
-        navRight.title = 'View profile';
-        
-        const popup = navRight.querySelector('.profile-popup');
-        
-        navRight.addEventListener('click', (e) => {
-          if (popup.contains(e.target)) {
-            if (e.target.classList.contains('logout-btn')) {
-              if (confirm('Do you want to log out?')) {
-                fetch('/auth/logout', { method: 'POST' })
-                  .then(res => {
-                    window.location.href = '../index.html';
-                  })
-                  .catch(() => {
-                    window.location.href = '../index.html';
-                  });
-              }
-            }
-            return;
-          }
-          
-          popup.classList.toggle('show');
-          e.stopPropagation();
-        });
-
-        document.addEventListener('click', () => {
-          popup.classList.remove('show');
-        });
-      }
-    })
-    .catch(() => {
-      window.location.href = '../index.html';
-    });
-})();
-
 document.addEventListener('DOMContentLoaded', () => {
   const main = document.querySelector('main');
   const sprintForm = document.querySelector('.backlog-header details:nth-of-type(1) form');
@@ -81,20 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const h2 = el.querySelector('h2');
     return (noSpan && noSpan.textContent.trim() === '–') || (h2 && h2.textContent.trim() === 'Backlog');
   });
-
-  // Inject backlog dragover styles dynamically
-  const style = document.createElement('style');
-  style.textContent = `
-    .backlog-drag-over {
-      border-top: 2px solid #822f3e !important;
-    }
-  `;
-  document.head.appendChild(style);
-
-  function escapeHTML(str) {
-    if (!str) return '';
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-  }
 
   // Populate assignee options in new issue form
   function populateAssigneeSelects() {
@@ -153,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <option value="review" ${issue.status === 'review' ? 'selected' : ''}>Review</option>
         <option value="done" ${issue.status === 'done' ? 'selected' : ''}>Done</option>
       </select>
-      <button class="delete-btn" style="background: none; border: none; color: #822f3e; font-weight: bold; font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+      <button class="delete-btn">&times;</button>
     `;
     return li;
   }
@@ -494,21 +411,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const editForm = document.createElement('form');
       editForm.className = 'edit-sprint-form';
-      editForm.style.cssText = 'padding: 15px 20px; background: #faf9f8; border-bottom: 1px solid #e9dfde; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;';
       
       const sDate = sprint.start_date ? new Date(sprint.start_date).toISOString().split('T')[0] : '';
       const eDate = sprint.end_date ? new Date(sprint.end_date).toISOString().split('T')[0] : '';
 
       editForm.innerHTML = `
-        <input type="text" class="edit-sprint-name" value="${escapeHTML(sprint.name)}" placeholder="Sprint name" required style="font-size: 13px; padding: 4px 8px; border: 1px solid #e9dfde; border-radius: 4px; height: 30px;">
-        <div style="display: flex; gap: 8px;">
-          <input type="date" class="edit-sprint-start" value="${sDate}" required style="font-size: 12px; padding: 4px; border: 1px solid #e9dfde; border-radius: 4px; flex: 1; height: 30px;">
-          <input type="date" class="edit-sprint-end" value="${eDate}" required style="font-size: 12px; padding: 4px; border: 1px solid #e9dfde; border-radius: 4px; flex: 1; height: 30px;">
+        <input type="text" class="edit-sprint-name" value="${escapeHTML(sprint.name)}" placeholder="Sprint name" required>
+        <div class="form-row">
+          <input type="date" class="edit-sprint-start" value="${sDate}" required>
+          <input type="date" class="edit-sprint-end" value="${eDate}" required>
         </div>
-        <textarea class="edit-sprint-goal" placeholder="Goal (optional)" rows="2" style="font-size: 13px; padding: 4px 8px; border: 1px solid #e9dfde; border-radius: 4px; font-family: inherit;">${escapeHTML(sprint.goal || '')}</textarea>
-        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
-          <button type="button" class="cancel-edit-sprint-btn" style="padding: 4px 10px; font-size: 12px; border: 1px solid #e9dfde; background: #fff; border-radius: 4px; cursor: pointer;">Cancel</button>
-          <button type="submit" style="padding: 4px 10px; font-size: 12px; border: none; background: #822f3e; color: #fff; border-radius: 4px; cursor: pointer; font-weight: bold;">Save</button>
+        <textarea class="edit-sprint-goal" placeholder="Goal (optional)" rows="2">${escapeHTML(sprint.goal || '')}</textarea>
+        <div class="form-actions">
+          <button type="button" class="cancel-edit-sprint-btn">Cancel</button>
+          <button type="submit" class="save-edit-sprint-btn">Save</button>
         </div>
       `;
 
@@ -704,7 +620,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const li = e.target.closest('li');
     if (li && backlogDetails && backlogDetails.contains(li)) {
       draggedRow = li;
-      li.style.opacity = '0.5';
+      li.classList.add('backlog-dragging');
       e.dataTransfer.setData('text/plain', '');
     }
   });
@@ -712,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
   main.addEventListener('dragend', (e) => {
     const li = e.target.closest('li');
     if (li) {
-      li.style.opacity = '';
+      li.classList.remove('backlog-dragging');
     }
     draggedRow = null;
     document.querySelectorAll('.backlog-drag-over').forEach(el => el.classList.remove('backlog-drag-over'));
@@ -822,45 +738,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const dates = sprint.start_date && sprint.end_date ? `${formatDate(sprint.start_date)} – ${formatDate(sprint.end_date)}` : 'No dates';
     
     let statusText = sprint.status || 'Created';
-    let statusHTML = `<span class="sprint-status-badge" style="font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; background: #e9dfde; color: #555;">${statusText}</span>`;
+    let statusHTML = `<span class="sprint-status-badge">${statusText}</span>`;
     if (statusText === 'In Progress') {
-      statusHTML = `<span class="sprint-status-badge" style="font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; background: #faf0ed; color: #822f3e;">Active</span>`;
+      statusHTML = `<span class="sprint-status-badge active-sprint-badge">Active</span>`;
     } else if (statusText === 'Closed') {
-      statusHTML = `<span class="sprint-status-badge" style="font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; background: #eaeaea; color: #7f8c8d;">Closed</span>`;
+      statusHTML = `<span class="sprint-status-badge closed-sprint-badge">Closed</span>`;
     }
 
     let actionButtonsHTML = '';
     if (statusText === 'Created') {
       actionButtonsHTML = `
-        <button class="start-sprint-btn" style="padding: 4px 8px; font-size: 12px; border: none; background: #822f3e; color: #fff; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 10px;">Start</button>
-        <button class="edit-sprint-btn" style="padding: 4px 8px; font-size: 12px; border: 1px solid #e9dfde; background: #fff; color: #333; border-radius: 4px; cursor: pointer; margin-left: 5px;">Edit</button>
+        <button class="start-sprint-btn font-bold">Start</button>
+        <button class="edit-sprint-btn">Edit</button>
       `;
     } else if (statusText === 'In Progress') {
       actionButtonsHTML = `
-        <button class="complete-sprint-btn" style="padding: 4px 8px; font-size: 12px; border: none; background: #27ae60; color: #fff; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 10px;">Complete</button>
-        <button class="edit-sprint-btn" style="padding: 4px 8px; font-size: 12px; border: 1px solid #e9dfde; background: #fff; color: #333; border-radius: 4px; cursor: pointer; margin-left: 5px;">Edit</button>
+        <button class="complete-sprint-btn font-bold">Complete</button>
+        <button class="edit-sprint-btn">Edit</button>
       `;
     } else if (statusText === 'Closed') {
       actionButtonsHTML = `
-        <span style="font-size: 12px; color: #7f8c8d; margin-left: 10px; font-style: italic;">Completed</span>
+        <span class="completed-label">Completed</span>
       `;
     }
 
     details.innerHTML = `
-      <summary style="display: flex; align-items: center; justify-content: space-between; padding: 10px 20px;">
-        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
-          <span class="no" style="font-weight: bold;">Sprint ${sprint.id}</span>
-          <div style="flex: 1;">
-            <h2 class="sprint-title-text" style="font-size: 15px; font-weight: 700; margin: 0; color: #822f3e;">${escapeHTML(sprint.name)}</h2>
-            <p style="margin: 2px 0 0 0; font-size: 12px; color: #7f8c8d;">
+      <summary class="sprint-summary-header">
+        <div class="sprint-summary-left">
+          <span class="no">Sprint ${sprint.id}</span>
+          <div class="sprint-summary-details">
+            <h2 class="sprint-title-text">${escapeHTML(sprint.name)}</h2>
+            <p class="sprint-status-wrapper">
               <em>${statusHTML}</em> <span class="sprint-dates-text">${dates}</span>
             </p>
-            ${sprint.goal ? `<p class="goal sprint-goal-text" style="margin: 4px 0 0 0; font-size: 12px; color: #555;">${escapeHTML(sprint.goal)}</p>` : '<p class="goal sprint-goal-text" style="margin: 4px 0 0 0; font-size: 12px; color: #555; display: none;"></p>'}
+            ${sprint.goal ? `<p class="goal sprint-goal-text">${escapeHTML(sprint.goal)}</p>` : '<p class="goal sprint-goal-text hidden"></p>'}
           </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;" class="sprint-summary-actions">
+        <div class="sprint-summary-actions">
           ${actionButtonsHTML}
-          <span class="count" style="font-size: 12px; color: #7f8c8d;">0 issues</span>
+          <span class="count">0 issues</span>
         </div>
       </summary>
       <ul></ul>

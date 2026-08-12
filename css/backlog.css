@@ -421,4 +421,181 @@ main {
   }
 }
 
+.sprint-status-badge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  background: #e9dfde;
+  color: #555;
+}
+.active-sprint-badge {
+  background: #faf0ed;
+  color: #822f3e;
+}
+.closed-sprint-badge {
+  background: #eaeaea;
+  color: #7f8c8d;
+}
+.start-sprint-btn, .complete-sprint-btn, .edit-sprint-btn {
+  padding: 4px 8px;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+.start-sprint-btn {
+  background: #822f3e;
+  color: #fff;
+  font-weight: bold;
+}
+.complete-sprint-btn {
+  background: #27ae60;
+  color: #fff;
+  font-weight: bold;
+}
+.edit-sprint-btn {
+  border: 1px solid #e9dfde;
+  background: #fff;
+  color: #333;
+}
+.completed-label {
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-left: 10px;
+  font-style: italic;
+}
+.sprint-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+.sprint-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+.sprint-summary-left .no {
+  font-weight: bold;
+}
+.sprint-summary-details {
+  flex: 1;
+}
+.sprint-summary-details h2 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+  color: #822f3e;
+}
+.sprint-summary-details p {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #7f8c8d;
+}
+.sprint-summary-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.edit-sprint-form {
+  padding: 15px 20px;
+  background: #faf9f8;
+  border-bottom: 1px solid #e9dfde;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.edit-sprint-form input, .edit-sprint-form textarea {
+  border: 1px solid #e9dfde;
+  border-radius: 4px;
+  font-family: inherit;
+}
+.edit-sprint-form input[type="text"] {
+  font-size: 13px;
+  padding: 4px 8px;
+  height: 30px;
+}
+.edit-sprint-form .form-row {
+  display: flex;
+  gap: 8px;
+}
+.edit-sprint-form input[type="date"] {
+  font-size: 12px;
+  padding: 4px;
+  flex: 1;
+  height: 30px;
+}
+.edit-sprint-form textarea {
+  font-size: 13px;
+  padding: 4px 8px;
+}
+.edit-sprint-form .form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.cancel-edit-sprint-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid #e9dfde;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.save-edit-sprint-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  border: none;
+  background: #822f3e;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.backlog-drag-over {
+  border-top: 2px solid #822f3e !important;
+}
+.backlog-dragging {
+  opacity: 0.5;
+}
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  font-family: inherit;
+}
+.user-meta .user-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: #822f3e;
+}
+.user-meta .user-role {
+  font-size: 10px;
+  color: #7f8c8d;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.profile-popup .profile-role {
+  font-size: 11px;
+  color: #822f3e;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  text-align: center;
+}
+.profile-popup .profile-email {
+  margin-bottom: 12px;
+  text-align: center;
+}
+.hidden {
+  display: none !important;
+}
+
 /*# sourceMappingURL=backlog.css.map */

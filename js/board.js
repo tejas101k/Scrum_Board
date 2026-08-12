@@ -1,92 +1,6 @@
-// Check if user is logged in
-(function() {
-  fetch('/auth/me')
-    .then(res => {
-      if (!res.ok) {
-        window.location.href = '../index.html';
-        return;
-      }
-      return res.json();
-    })
-    .then(user => {
-      if (!user) return;
-      
-      // Update navbar with user info
-      const navRight = document.querySelector('.nav_right');
-      if (navRight) {
-        navRight.style.display = 'flex';
-        navRight.style.alignItems = 'center';
-        navRight.style.gap = '10px';
-        navRight.innerHTML = `
-          <div class="user-meta" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; font-family: inherit;">
-            <span class="user-name" style="font-weight: 700; font-size: 13px; color: #822f3e;">${user.name}</span>
-            <span class="user-role" style="font-size: 10px; color: #7f8c8d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">${user.role || 'Admin'}</span>
-          </div>
-          <div class="avatar">${user.initials}</div>
-          <div class="profile-popup">
-            <div class="avatar large">${user.initials}</div>
-            <div class="profile-name">${user.name}</div>
-            <div class="profile-role" style="font-size: 11px; color: #822f3e; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">${user.role || 'Admin'}</div>
-            <div class="profile-email" style="margin-bottom: 12px;">${user.email || ''}</div>
-            <button class="logout-btn">Log Out</button>
-          </div>
-        `;
-        
-        navRight.style.cursor = 'pointer';
-        navRight.title = 'View profile';
-        
-        const popup = navRight.querySelector('.profile-popup');
-        
-        navRight.addEventListener('click', (e) => {
-          if (popup.contains(e.target)) {
-            if (e.target.classList.contains('logout-btn')) {
-              if (confirm('Do you want to log out?')) {
-                fetch('/auth/logout', { method: 'POST' })
-                  .then(res => {
-                    window.location.href = '../index.html';
-                  })
-                  .catch(() => {
-                    window.location.href = '../index.html';
-                  });
-              }
-            }
-            return;
-          }
-          
-          popup.classList.toggle('show');
-          e.stopPropagation();
-        });
-
-        document.addEventListener('click', () => {
-          popup.classList.remove('show');
-        });
-      }
-    })
-    .catch(() => {
-      window.location.href = '../index.html';
-    });
-})();
-
 document.addEventListener('DOMContentLoaded', () => {
   const board = document.querySelector('.board');
   if (!board) return;
-
-  // Append drag & drop styles
-  const style = document.createElement('style');
-  style.textContent = `
-    .card.dragging { opacity: 0.4; }
-    .col.drag-over {
-      background-color: #f5eceb !important;
-      border: 2px dashed #c9a4a1;
-      border-radius: 8px;
-    }
-  `;
-  document.head.appendChild(style);
-
-  function escapeHTML(str) {
-    if (!str) return '';
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-  }
 
   // Create card element with inline styled delete button
   function createCardElement(task) {
@@ -98,9 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const initials = task.assignee_initials || '–';
     card.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+      <div class="card-header-row">
         <span class="tag">${task.type === 'story' ? 'S' : (task.type === 'bug' ? 'B' : 'T')}</span>
-        <button class="delete-btn" style="background: none; border: none; color: #822f3e; font-weight: bold; font-size: 16px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+        <button class="delete-btn">&times;</button>
       </div>
       <p>${escapeHTML(task.title)}</p>
       <select class="status" data-status="${task.status}">

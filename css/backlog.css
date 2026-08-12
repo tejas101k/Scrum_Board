@@ -703,18 +703,21 @@ main {
   width: 90px;
   flex-shrink: 0;
   text-align: left;
+  padding-left: 10px;
 }
 
 .backlog-row-header .priority-header {
   width: 85px;
   flex-shrink: 0;
   text-align: left;
+  padding-left: 10px;
 }
 
 .backlog-row-header .assignee-header {
   width: 110px;
   flex-shrink: 0;
   text-align: left;
+  padding-left: 10px;
 }
 
 .backlog-row-header .points-header {
@@ -783,9 +786,10 @@ button:disabled, select:disabled, input:disabled {
     margin-left: 0 !important;
   }
   .sprint li {
-    padding: 12px 16px !important;
-    flex-wrap: wrap !important;
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
     gap: 8px !important;
+    padding: 12px 16px !important;
   }
   /* Color-Coded Issue Type Left Borders style */
   .sprint li[data-id] {
@@ -801,27 +805,59 @@ button:disabled, select:disabled, input:disabled {
     border-left: 4px solid #8b94a3 !important;
   }
   .sprint li .tag {
-    order: 1;
+    grid-column: 1/2 !important;
+    grid-row: 1 !important;
+    justify-self: start !important;
+    align-self: center !important;
   }
   .sprint li .title {
-    flex: 1 1 auto;
-    order: 2;
-    font-size: 14px;
+    grid-column: 2/6 !important;
+    grid-row: 1 !important;
+    font-size: 14px !important;
+    align-self: center !important;
+    word-break: break-word !important;
   }
   .sprint li .delete-btn {
-    order: 3;
+    grid-column: 6/7 !important;
+    grid-row: 1 !important;
+    justify-self: end !important;
+    align-self: center !important;
     margin-left: auto;
   }
-  .sprint li select.issue-sprint,
-  .sprint li select.priority,
-  .sprint li select.who,
-  .sprint li input.points,
+  .sprint li select.issue-sprint {
+    grid-column: span 2 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    height: 28px !important;
+    font-size: 11px !important;
+  }
+  .sprint li select.priority {
+    grid-column: span 2 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    height: 28px !important;
+    font-size: 11px !important;
+  }
+  .sprint li select.who {
+    grid-column: span 2 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    height: 28px !important;
+    font-size: 11px !important;
+  }
+  .sprint li input.points {
+    grid-column: span 3 !important;
+    grid-row: 3 !important;
+    width: 100% !important;
+    height: 28px !important;
+    font-size: 11px !important;
+  }
   .sprint li select.status {
-    order: 4;
-    width: calc(33.33% - 8px) !important;
-    flex: 1 1 calc(33.33% - 8px);
-    height: 28px;
-    font-size: 11px;
+    grid-column: span 3 !important;
+    grid-row: 3 !important;
+    width: 100% !important;
+    height: 28px !important;
+    font-size: 11px !important;
   }
   /* Centered and Clean Mobile Legend style */
   .legend {

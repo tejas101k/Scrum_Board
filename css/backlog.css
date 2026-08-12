@@ -200,7 +200,7 @@ main {
   right: 0;
   top: 100%;
   margin-top: 8px;
-  width: 280px;
+  width: 380px;
   background: #fff;
   border: 1px solid #e9dfde;
   border-radius: 8px;
@@ -373,7 +373,7 @@ main {
   width: 85px;
 }
 .sprint .who {
-  width: 52px;
+  width: 110px;
   text-align: center;
   color: #822f3e;
   font-weight: 700;

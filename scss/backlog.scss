@@ -34,7 +34,7 @@ main {
     right: 0;
     top: 100%;
     margin-top: 8px;
-    width: 280px;
+    width: 380px;
     background: #fff;
     border: 1px solid $line;
     border-radius: 8px;
@@ -172,7 +172,7 @@ main {
 
   li select.issue-sprint { width: 90px; }
   .priority { width: 85px; }
-  .who { width: 52px; text-align: center; color: $accent; font-weight: 700; }
+  .who { width: 110px; text-align: center; color: $accent; font-weight: 700; }
   input.points { width: 46px; text-align: center; }
 
   .status {

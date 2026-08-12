@@ -14,13 +14,20 @@
       // Update navbar with user info
       const navRight = document.querySelector('.nav_right');
       if (navRight) {
+        navRight.style.display = 'flex';
+        navRight.style.alignItems = 'center';
+        navRight.style.gap = '10px';
         navRight.innerHTML = `
-          <div class="user-name">${user.name}</div>
+          <div class="user-meta" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; font-family: inherit;">
+            <span class="user-name" style="font-weight: 700; font-size: 13px; color: #822f3e;">${user.name}</span>
+            <span class="user-role" style="font-size: 10px; color: #7f8c8d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">${user.role || 'Admin'}</span>
+          </div>
           <div class="avatar">${user.initials}</div>
           <div class="profile-popup">
             <div class="avatar large">${user.initials}</div>
             <div class="profile-name">${user.name}</div>
-            <div class="profile-email">${user.email || ''}</div>
+            <div class="profile-role" style="font-size: 11px; color: #822f3e; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">${user.role || 'Admin'}</div>
+            <div class="profile-email" style="margin-bottom: 12px;">${user.email || ''}</div>
             <button class="logout-btn">Log Out</button>
           </div>
         `;

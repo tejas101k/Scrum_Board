@@ -79,7 +79,8 @@ app.post('/auth/login', async (req, res) => {
       id: user.id,
       name: user.name,
       initials: user.initials,
-      email: user.email
+      email: user.email,
+      role: 'Admin'
     };
 
     res.json(req.session.user);

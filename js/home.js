@@ -14,13 +14,20 @@
       // Update navbar
       const navRight = document.querySelector('.nav_right');
       if (navRight) {
+        navRight.style.display = 'flex';
+        navRight.style.alignItems = 'center';
+        navRight.style.gap = '10px';
         navRight.innerHTML = `
-          <div class="user-name">${user.name}</div>
+          <div class="user-meta" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; font-family: inherit;">
+            <span class="user-name" style="font-weight: 700; font-size: 13px; color: #822f3e;">${user.name}</span>
+            <span class="user-role" style="font-size: 10px; color: #7f8c8d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">${user.role || 'Admin'}</span>
+          </div>
           <div class="avatar">${user.initials}</div>
           <div class="profile-popup">
             <div class="avatar large">${user.initials}</div>
             <div class="profile-name">${user.name}</div>
-            <div class="profile-email">${user.email || ''}</div>
+            <div class="profile-role" style="font-size: 11px; color: #822f3e; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">${user.role || 'Admin'}</div>
+            <div class="profile-email" style="margin-bottom: 12px;">${user.email || ''}</div>
             <button class="logout-btn">Log Out</button>
           </div>
         `;
@@ -79,15 +86,16 @@ document.addEventListener('DOMContentLoaded', () => {
       })
     ])
     .then(([sprints, tasks]) => {
+      const activeSprints = sprints.filter(s => s.status === 'In Progress');
+
       if (headingEl) {
-        const activeCount = sprints.filter(s => s.status === 'In Progress').length;
-        headingEl.textContent = `Active Sprints: ${activeCount}`;
+        headingEl.textContent = `Active Sprints: ${activeSprints.length}`;
       }
 
-      if (sprints.length === 0) {
+      if (activeSprints.length === 0) {
         sprintsContainer.innerHTML = `
           <div style="grid-column: span 3; text-align: center; color: #7f8c8d; padding: 40px 0;">
-            No active sprints found. Create one in the Backlog page!
+            No active sprints found. Create and start one in the Backlog page!
           </div>
         `;
         return;
@@ -102,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${date.getDate()} ${shortMonths[m]}`;
       }
 
-      sprints.forEach(sprint => {
+      activeSprints.forEach(sprint => {
         const sprintTasks = tasks.filter(t => t.sprint_id === sprint.id);
         const total = sprintTasks.length;
         const todo = sprintTasks.filter(t => t.status === 'todo').length;
@@ -113,10 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ? `${formatDate(sprint.start_date)} – ${formatDate(sprint.end_date)}` 
           : 'No dates';
 
-        let statusLabel = sprint.status || 'Created';
-        if (statusLabel === 'In Progress') {
-          statusLabel = 'Active';
-        }
+        let statusLabel = 'Active';
 
         // 1. Sprint number
         const numEl = document.createElement('div');

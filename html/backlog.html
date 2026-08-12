@@ -49,19 +49,19 @@
 
           <textarea placeholder="Description (optional)" rows="2"></textarea>
 
-          <select>
+          <select name="type">
             <option value="task">Task</option>
             <option value="bug">Bug</option>
             <option value="story">Story</option>
           </select>
 
-          <select>
+          <select name="sprint">
             <option value="12">Sprint 12 — Checkout</option>
             <option value="13">Sprint 13 — Login</option>
             <option value="">Backlog (unscheduled)</option>
           </select>
 
-          <select>
+          <select name="priority">
             <option value="">Priority</option>
             <option value="Low">Low</option>
             <option value="Normal">Normal</option>
@@ -69,15 +69,11 @@
             <option value="High">High</option>
           </select>
 
-          <select>
+          <select name="assignee">
             <option value="">Assignee</option>
-            <option value="PS">Priya Sharma</option>
-            <option value="AM">Arjun Mehta</option>
-            <option value="RK">Rhea Kapoor</option>
-            <option value="">Unassigned</option>
           </select>
 
-          <select>
+          <select name="status">
             <option value="">State</option>
             <option value="todo" selected>To Do</option>
             <option value="progress">In Progress</option>
@@ -106,122 +102,10 @@
           <p><em>Active</em> 1 Aug – 7 Aug</p>
           <p class="goal">Redesign the payment flow to reduce cart drop-off and support UPI payments.</p>
         </div>
-        <span class="count">4 issues</span>
+        <span class="count">0 issues</span>
       </summary>
 
       <ul>
-        <li>
-          <span class="tag" data-type="story">S</span>
-          <span class="title">Redesign payment step layout</span>
-          <select class="issue-sprint">
-            <option value="12" selected>Sprint 12</option>
-            <option value="13">Sprint 13</option>
-            <option value="">Backlog</option>
-          </select>
-          <select class="priority">
-            <option value="Low">Low</option>
-            <option value="Normal">Normal</option>
-            <option value="Medium">Medium</option>
-            <option value="High" selected>High</option>
-          </select>
-          <select class="who">
-            <option value="PS" selected>PS</option>
-            <option value="AM">AM</option>
-            <option value="RK">RK</option>
-            <option value="">–</option>
-          </select>
-          <input type="number" class="points" value="5" min="0">
-          <select class="status" data-status="progress">
-            <option value="todo">To Do</option>
-            <option value="progress" selected>In Progress</option>
-            <option value="review">Review</option>
-            <option value="done">Done</option>
-          </select>
-        </li>
-        <li>
-          <span class="tag" data-type="bug">B</span>
-          <span class="title">Coupon field rejects valid codes</span>
-          <select class="issue-sprint">
-            <option value="12" selected>Sprint 12</option>
-            <option value="13">Sprint 13</option>
-            <option value="">Backlog</option>
-          </select>
-          <select class="priority">
-            <option value="Low">Low</option>
-            <option value="Normal">Normal</option>
-            <option value="Medium">Medium</option>
-            <option value="High" selected>High</option>
-          </select>
-          <select class="who">
-            <option value="PS">PS</option>
-            <option value="AM" selected>AM</option>
-            <option value="RK">RK</option>
-            <option value="">–</option>
-          </select>
-          <input type="number" class="points" value="3" min="0">
-          <select class="status" data-status="todo">
-            <option value="todo" selected>To Do</option>
-            <option value="progress">In Progress</option>
-            <option value="review">Review</option>
-            <option value="done">Done</option>
-          </select>
-        </li>
-        <li>
-          <span class="tag" data-type="task">T</span>
-          <span class="title">Add saved-address autofill</span>
-          <select class="issue-sprint">
-            <option value="12" selected>Sprint 12</option>
-            <option value="13">Sprint 13</option>
-            <option value="">Backlog</option>
-          </select>
-          <select class="priority">
-            <option value="Low">Low</option>
-            <option value="Normal">Normal</option>
-            <option value="Medium" selected>Medium</option>
-            <option value="High">High</option>
-          </select>
-          <select class="who">
-            <option value="PS" selected>PS</option>
-            <option value="AM">AM</option>
-            <option value="RK">RK</option>
-            <option value="">–</option>
-          </select>
-          <input type="number" class="points" value="2" min="0">
-          <select class="status" data-status="done">
-            <option value="todo">To Do</option>
-            <option value="progress">In Progress</option>
-            <option value="review">Review</option>
-            <option value="done" selected>Done</option>
-          </select>
-        </li>
-        <li>
-          <span class="tag" data-type="task">T</span>
-          <span class="title">Write checkout QA checklist</span>
-          <select class="issue-sprint">
-            <option value="12" selected>Sprint 12</option>
-            <option value="13">Sprint 13</option>
-            <option value="">Backlog</option>
-          </select>
-          <select class="priority">
-            <option value="Low" selected>Low</option>
-            <option value="Normal">Normal</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-          </select>
-          <select class="who">
-            <option value="PS">PS</option>
-            <option value="AM">AM</option>
-            <option value="RK" selected>RK</option>
-            <option value="">–</option>
-          </select>
-          <input type="number" class="points" value="1" min="0">
-          <select class="status" data-status="todo">
-            <option value="todo" selected>To Do</option>
-            <option value="progress">In Progress</option>
-            <option value="review">Review</option>
-            <option value="done">Done</option>
-          </select>
-        </li>
       </ul>
     </details>
 
@@ -233,66 +117,10 @@
           <p><em>Active</em> 8 Aug – 15 Aug</p>
           <p class="goal">Rebuild the login and signup screens with proper validation and role-based access.</p>
         </div>
-        <span class="count">2 issues</span>
+        <span class="count">0 issues</span>
       </summary>
 
       <ul>
-        <li>
-          <span class="tag" data-type="story">S</span>
-          <span class="title">Design in-app notification center</span>
-          <select class="issue-sprint">
-            <option value="12">Sprint 12</option>
-            <option value="13" selected>Sprint 13</option>
-            <option value="">Backlog</option>
-          </select>
-          <select class="priority">
-            <option value="Low">Low</option>
-            <option value="Normal">Normal</option>
-            <option value="Medium" selected>Medium</option>
-            <option value="High">High</option>
-          </select>
-          <select class="who">
-            <option value="PS">PS</option>
-            <option value="AM" selected>AM</option>
-            <option value="RK">RK</option>
-            <option value="">–</option>
-          </select>
-          <input type="number" class="points" value="8" min="0">
-          <select class="status" data-status="todo">
-            <option value="todo" selected>To Do</option>
-            <option value="progress">In Progress</option>
-            <option value="review">Review</option>
-            <option value="done">Done</option>
-          </select>
-        </li>
-        <li>
-          <span class="tag" data-type="task">T</span>
-          <span class="title">Set up push notification service</span>
-          <select class="issue-sprint">
-            <option value="12">Sprint 12</option>
-            <option value="13" selected>Sprint 13</option>
-            <option value="">Backlog</option>
-          </select>
-          <select class="priority">
-            <option value="Low">Low</option>
-            <option value="Normal">Normal</option>
-            <option value="Medium">Medium</option>
-            <option value="High" selected>High</option>
-          </select>
-          <select class="who">
-            <option value="PS">PS</option>
-            <option value="AM">AM</option>
-            <option value="RK" selected>RK</option>
-            <option value="">–</option>
-          </select>
-          <input type="number" class="points" value="5" min="0">
-          <select class="status" data-status="progress">
-            <option value="todo">To Do</option>
-            <option value="progress" selected>In Progress</option>
-            <option value="review">Review</option>
-            <option value="done">Done</option>
-          </select>
-        </li>
       </ul>
     </details>
 
@@ -303,66 +131,10 @@
           <h2>Backlog</h2>
           <p>Not yet scheduled</p>
         </div>
-        <span class="count">2 issues</span>
+        <span class="count">0 issues</span>
       </summary>
 
       <ul>
-        <li>
-          <span class="tag" data-type="task">T</span>
-          <span class="title">Migrate legacy invoice templates</span>
-          <select class="issue-sprint">
-            <option value="12">Sprint 12</option>
-            <option value="13">Sprint 13</option>
-            <option value="" selected>Backlog</option>
-          </select>
-          <select class="priority">
-            <option value="Low" selected>Low</option>
-            <option value="Normal">Normal</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-          </select>
-          <select class="who">
-            <option value="PS">PS</option>
-            <option value="AM">AM</option>
-            <option value="RK">RK</option>
-            <option value="" selected>–</option>
-          </select>
-          <input type="number" class="points" value="3" min="0">
-          <select class="status" data-status="todo">
-            <option value="todo" selected>To Do</option>
-            <option value="progress">In Progress</option>
-            <option value="review">Review</option>
-            <option value="done">Done</option>
-          </select>
-        </li>
-        <li>
-          <span class="tag" data-type="bug">B</span>
-          <span class="title">Timezone mismatch on export dates</span>
-          <select class="issue-sprint">
-            <option value="12">Sprint 12</option>
-            <option value="13">Sprint 13</option>
-            <option value="" selected>Backlog</option>
-          </select>
-          <select class="priority">
-            <option value="Low">Low</option>
-            <option value="Normal">Normal</option>
-            <option value="Medium" selected>Medium</option>
-            <option value="High">High</option>
-          </select>
-          <select class="who">
-            <option value="PS">PS</option>
-            <option value="AM">AM</option>
-            <option value="RK">RK</option>
-            <option value="" selected>–</option>
-          </select>
-          <input type="number" class="points" value="2" min="0">
-          <select class="status" data-status="todo">
-            <option value="todo" selected>To Do</option>
-            <option value="progress">In Progress</option>
-            <option value="review">Review</option>
-            <option value="done">Done</option>
-          </select>
-        </li>
       </ul>
     </details>
 

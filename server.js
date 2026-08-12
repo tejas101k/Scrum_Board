@@ -26,13 +26,17 @@ const pool = new Pool({
 const app = express();
 app.use(express.json());
 
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Session config
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false,
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000
   }
@@ -79,8 +83,7 @@ app.post('/auth/login', async (req, res) => {
       id: user.id,
       name: user.name,
       initials: user.initials,
-      email: user.email,
-      role: 'Admin'
+      email: user.email
     };
 
     res.json(req.session.user);
@@ -189,6 +192,47 @@ app.post('/tasks', requireAuth, async (req, res) => {
   }
 });
 
+// Reorder backlog tasks
+app.put('/tasks/reorder', requireAuth, async (req, res) => {
+  const { ids } = req.body;
+  if (!ids || !Array.isArray(ids)) {
+    return res.status(400).json({ error: 'Missing or invalid ids array' });
+  }
+
+  const cleanIds = ids.map(id => parseInt(id)).filter(id => !isNaN(id));
+  if (cleanIds.length === 0) {
+    return res.json({ success: true });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Verify submitted IDs represent existing backlog tasks (sprint_id IS NULL)
+    const { rows } = await client.query(
+      'SELECT id FROM tasks WHERE sprint_id IS NULL AND id = ANY($1::int[])',
+      [cleanIds]
+    );
+    const validBacklogIds = new Set(rows.map(r => r.id));
+
+    // Update positions strictly on verified backlog tasks
+    for (let pos = 1; pos <= cleanIds.length; pos++) {
+      const id = cleanIds[pos - 1];
+      if (validBacklogIds.has(id)) {
+        await client.query('UPDATE tasks SET position = $1 WHERE id = $2', [pos, id]);
+      }
+    }
+
+    await client.query('COMMIT');
+    res.json({ success: true });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    res.status(500).json({ error: 'Server error' });
+  } finally {
+    client.release();
+  }
+});
+
 // Update task
 app.put('/tasks/:id', requireAuth, async (req, res) => {
   const { title, description, type, priority, status, assignee_id, story_points, sprint_id } = req.body;
@@ -251,29 +295,6 @@ app.put('/tasks/:id', requireAuth, async (req, res) => {
     if (err.code === '23503') {
       return res.status(400).json({ error: 'Invalid assignee or sprint reference' });
     }
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Reorder backlog tasks
-app.put('/tasks/reorder', requireAuth, async (req, res) => {
-  const { ids } = req.body;
-  if (!ids || !Array.isArray(ids)) {
-    return res.status(400).json({ error: 'Missing or invalid ids array' });
-  }
-
-  try {
-    await pool.query('BEGIN');
-    for (let pos = 1; pos <= ids.length; pos++) {
-      const id = parseInt(ids[pos - 1]);
-      if (!isNaN(id)) {
-        await pool.query('UPDATE tasks SET position = $1, sprint_id = NULL WHERE id = $2', [pos, id]);
-      }
-    }
-    await pool.query('COMMIT');
-    res.json({ success: true });
-  } catch (err) {
-    await pool.query('ROLLBACK');
     res.status(500).json({ error: 'Server error' });
   }
 });

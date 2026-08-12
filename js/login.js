@@ -3,11 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!form) return;
 
   const errorMessage = document.createElement('div');
-  errorMessage.style.color = '#e74c3c';
-  errorMessage.style.fontSize = '12px';
-  errorMessage.style.marginTop = '10px';
-  errorMessage.style.textAlign = 'center';
-  errorMessage.style.fontWeight = 'bold';
+  errorMessage.className = 'error-msg';
   form.appendChild(errorMessage);
 
   form.addEventListener('submit', (e) => {
@@ -28,6 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
     // Submit credentials to login
     fetch('/auth/login', {
       method: 'POST',
@@ -40,11 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (res.ok) {
         window.location.href = 'html/home.html';
       } else {
+        if (submitBtn) submitBtn.disabled = false;
         const errData = await res.json().catch(() => ({}));
         errorMessage.textContent = errData.error || 'Invalid email or password.';
       }
     })
     .catch((err) => {
+      if (submitBtn) submitBtn.disabled = false;
       console.error('Login error:', err);
       errorMessage.textContent = 'A network error occurred. Please try again.';
     });

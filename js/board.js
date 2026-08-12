@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const board = document.querySelector('.board');
   if (!board) return;
 
-  // Create card element with inline styled delete button
+  // Create card element with proper visible labels and deletion button
   function createCardElement(task) {
     const card = document.createElement('div');
     card.className = 'card';
@@ -14,41 +14,95 @@ document.addEventListener('DOMContentLoaded', () => {
     card.innerHTML = `
       <div class="card-header-row">
         <span class="tag">${task.type === 'story' ? 'S' : (task.type === 'bug' ? 'B' : 'T')}</span>
-        <button class="delete-btn">&times;</button>
+        <button class="delete-btn" aria-label="Delete issue" title="Delete issue">&times;</button>
       </div>
-      <p>${escapeHTML(task.title)}</p>
-      <select class="status" data-status="${task.status}">
-        <option value="todo" ${task.status === 'todo' ? 'selected' : ''}>To Do</option>
-        <option value="progress" ${task.status === 'progress' ? 'selected' : ''}>In Progress</option>
-        <option value="review" ${task.status === 'review' ? 'selected' : ''}>In Review</option>
-        <option value="done" ${task.status === 'done' ? 'selected' : ''}>Done</option>
-      </select>
-      <div class="card-foot">
-        <span>${escapeHTML(task.priority)}</span>
-        <span class="who-badge">${escapeHTML(initials)}</span>
+      <p class="card-title">${escapeHTML(task.title)}</p>
+      
+      <div class="card-field-group">
+        <span class="field-label">Type:</span>
+        <span class="field-value">${escapeHTML(task.type)}</span>
+      </div>
+
+      <div class="card-field-group">
+        <span class="field-label">Priority:</span>
+        <span class="field-value">${escapeHTML(task.priority)}</span>
+      </div>
+
+      <div class="card-field-group">
+        <span class="field-label">Assignee:</span>
+        <span class="field-value">${escapeHTML(task.assignee_name || 'Unassigned')}</span>
+      </div>
+
+      <div class="card-field-group select-field">
+        <span class="field-label">Status:</span>
+        <select class="status" data-status="${task.status}">
+          <option value="todo" ${task.status === 'todo' ? 'selected' : ''}>To Do</option>
+          <option value="progress" ${task.status === 'progress' ? 'selected' : ''}>In Progress</option>
+          <option value="review" ${task.status === 'review' ? 'selected' : ''}>In Review</option>
+          <option value="done" ${task.status === 'done' ? 'selected' : ''}>Done</option>
+        </select>
       </div>
     `;
     return card;
   }
 
-  // Fetch and load tasks from the database
+  // Fetch and load tasks and sprints
   function loadTasks() {
     document.querySelectorAll('.col .card').forEach(c => c.remove());
-    fetch('/tasks')
-      .then(r => {
-        if (!r.ok) throw new Error('Failed to load tasks');
-        return r.json();
+    
+    // Clear any previous error/empty state notices
+    const oldNotice = document.querySelector('.board-empty-notice');
+    if (oldNotice) oldNotice.remove();
+
+    Promise.all([
+      fetch('/sprints').then(res => {
+        if (!res.ok) throw new Error('Failed to load sprints');
+        return res.json();
+      }),
+      fetch('/tasks').then(res => {
+        if (!res.ok) throw new Error('Failed to load tasks');
+        return res.json();
       })
-      .then(tasks => {
-        tasks.forEach(task => {
-          const col = board.querySelector(`.col[data-status="${task.status}"]`);
-          if (col) col.appendChild(createCardElement(task));
-        });
-        updateCounts();
-      })
-      .catch(err => {
-        console.error('Error loading tasks:', err);
+    ])
+    .then(([sprints, tasks]) => {
+      const activeSprints = sprints.filter(s => s.status === 'In Progress');
+      
+      if (activeSprints.length === 0) {
+        showBoardEmptyState('There are currently no active sprints. Start one on the Backlog page.');
+        return;
+      }
+
+      const activeSprintIds = new Set(activeSprints.map(s => s.id));
+      const activeTasks = tasks.filter(t => t.sprint_id !== null && activeSprintIds.has(t.sprint_id));
+
+      if (activeTasks.length === 0) {
+        showBoardEmptyState('The active sprint has no issues assigned to it.');
+        return;
+      }
+
+      activeTasks.forEach(task => {
+        const col = board.querySelector(`.col[data-status="${task.status}"]`);
+        if (col) col.appendChild(createCardElement(task));
       });
+      updateCounts();
+    })
+    .catch(err => {
+      console.error('Error loading tasks:', err);
+      showBoardEmptyState('Unable to load board data. Please refresh and try again.');
+    });
+  }
+
+  function showBoardEmptyState(message) {
+    document.querySelectorAll('.col .card').forEach(c => c.remove());
+    updateCounts();
+
+    const oldNotice = document.querySelector('.board-empty-notice');
+    if (oldNotice) oldNotice.remove();
+
+    const notice = document.createElement('div');
+    notice.className = 'board-empty-notice';
+    notice.textContent = message;
+    board.appendChild(notice);
   }
 
   loadTasks();
@@ -114,7 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ status: col.dataset.status })
       })
       .then(r => {
-        if (!r.ok) throw new Error('Update failed');
+        if (!r.ok) {
+          return r.json().then(err => { throw new Error(err.error || 'Update failed'); });
+        }
         return r.json();
       })
       .then(updatedTask => {
@@ -124,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       })
       .catch(err => {
-        alert('Failed to update status on server. Reverting.');
+        alert(err.message || 'Failed to update status on server. Reverting.');
         if (oldCol) {
           oldCol.appendChild(draggedCard);
         }
@@ -157,7 +213,9 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify({ status: newStatus })
         })
         .then(r => {
-          if (!r.ok) throw new Error('Update failed');
+          if (!r.ok) {
+            return r.json().then(err => { throw new Error(err.error || 'Update failed'); });
+          }
           return r.json();
         })
         .then(updatedTask => {
@@ -165,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
           e.target.dataset.status = updatedTask.status;
         })
         .catch(err => {
-          alert('Failed to update status on server. Reverting.');
+          alert(err.message || 'Failed to update status on server. Reverting.');
           const oldCol = board.querySelector(`.col[data-status="${oldStatus}"]`);
           if (oldCol) {
             oldCol.appendChild(card);

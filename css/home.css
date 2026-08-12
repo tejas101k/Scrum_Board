@@ -385,4 +385,49 @@ em {
   }
 }
 
+.home-empty-state, .home-error-state {
+  grid-column: span 3;
+  text-align: center;
+  padding: 40px 0;
+  font-weight: bold;
+}
+.home-empty-state {
+  color: #7f8c8d;
+}
+.home-error-state {
+  color: #e74c3c;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  font-family: inherit;
+}
+.user-meta .user-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: #822f3e;
+}
+.user-meta .user-role {
+  font-size: 10px;
+  color: #7f8c8d;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.profile-popup .profile-role {
+  font-size: 11px;
+  color: #822f3e;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  text-align: center;
+}
+.profile-popup .profile-email {
+  margin-bottom: 12px;
+  text-align: center;
+}
+
 /*# sourceMappingURL=home.css.map */

@@ -1,76 +1,6 @@
-// Check if user is logged in
-(function() {
-  fetch('/auth/me')
-    .then(res => {
-      if (!res.ok) {
-        window.location.href = '../index.html';
-        return;
-      }
-      return res.json();
-    })
-    .then(user => {
-      if (!user) return;
-      
-      // Update navbar
-      const navRight = document.querySelector('.nav_right');
-      if (navRight) {
-        navRight.style.display = 'flex';
-        navRight.style.alignItems = 'center';
-        navRight.style.gap = '10px';
-        navRight.innerHTML = `
-          <div class="user-meta" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; font-family: inherit;">
-            <span class="user-name" style="font-weight: 700; font-size: 13px; color: #822f3e;">${user.name}</span>
-            <span class="user-role" style="font-size: 10px; color: #7f8c8d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">${user.role || 'Admin'}</span>
-          </div>
-          <div class="avatar">${user.initials}</div>
-          <div class="profile-popup">
-            <div class="avatar large">${user.initials}</div>
-            <div class="profile-name">${user.name}</div>
-            <div class="profile-role" style="font-size: 11px; color: #822f3e; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">${user.role || 'Admin'}</div>
-            <div class="profile-email" style="margin-bottom: 12px;">${user.email || ''}</div>
-            <button class="logout-btn">Log Out</button>
-          </div>
-        `;
-        
-        navRight.style.cursor = 'pointer';
-        navRight.title = 'View profile';
-        const popup = navRight.querySelector('.profile-popup');
-        
-        navRight.addEventListener('click', (e) => {
-          if (popup.contains(e.target)) {
-            if (e.target.classList.contains('logout-btn')) {
-              if (confirm('Do you want to log out?')) {
-                fetch('/auth/logout', { method: 'POST' })
-                  .then(() => {
-                    window.location.href = '../index.html';
-                  });
-              }
-            }
-            return;
-          }
-          
-          popup.classList.toggle('show');
-          e.stopPropagation();
-        });
-
-        document.addEventListener('click', () => {
-          popup.classList.remove('show');
-        });
-      }
-    })
-    .catch(() => {
-      window.location.href = '../index.html';
-    });
-})();
-
 document.addEventListener('DOMContentLoaded', () => {
   const sprintsContainer = document.querySelector('.sprints');
   const headingEl = document.querySelector('.heading');
-
-  function escapeHTML(str) {
-    if (!str) return '';
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-  }
 
   if (sprintsContainer) {
     sprintsContainer.innerHTML = '';
@@ -94,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (activeSprints.length === 0) {
         sprintsContainer.innerHTML = `
-          <div style="grid-column: span 3; text-align: center; color: #7f8c8d; padding: 40px 0;">
+          <div class="home-empty-state">
             No active sprints found. Create and start one in the Backlog page!
           </div>
         `;
@@ -121,8 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
           ? `${formatDate(sprint.start_date)} – ${formatDate(sprint.end_date)}` 
           : 'No dates';
 
-        let statusLabel = 'Active';
-
         // 1. Sprint number
         const numEl = document.createElement('div');
         numEl.className = 'sprint_number';
@@ -133,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const detailsEl = document.createElement('div');
         detailsEl.innerHTML = `
           <h2>${escapeHTML(sprint.name)}</h2>
-          <p><em>${statusLabel}</em> <span class="sprint-date">${escapeHTML(datesText)}</span></p>
+          <p><em>Active</em> <span class="sprint-date">${escapeHTML(datesText)}</span></p>
           ${sprint.goal ? `
           <details class="goal-details" ${window.innerWidth > 640 ? 'open' : ''}>
             <summary>Description</summary>
@@ -161,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         headingEl.textContent = 'Failed to load sprints';
       }
       sprintsContainer.innerHTML = `
-        <div style="grid-column: span 3; text-align: center; color: #e74c3c; padding: 40px 0;">
+        <div class="home-error-state">
           Failed to load sprints. Please refresh the page.
         </div>
       `;

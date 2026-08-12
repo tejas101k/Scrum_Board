@@ -35,10 +35,24 @@
       <details class="new-item">
         <summary>+ New sprint</summary>
         <form>
-          <input type="text" placeholder="Sprint name" required>
-          <input type="date" required>
-          <input type="date" required>
-          <textarea placeholder="Goal (optional)" rows="2"></textarea>
+          <div class="form-group">
+            <label>Sprint Name</label>
+            <input type="text" placeholder="Sprint name" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Start Date</label>
+              <input type="date" required>
+            </div>
+            <div class="form-group flex-1">
+              <label>End Date</label>
+              <input type="date" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Goal (optional)</label>
+            <textarea placeholder="Goal (optional)" rows="2"></textarea>
+          </div>
           <button type="submit">Create sprint</button>
         </form>
       </details>
@@ -46,41 +60,69 @@
       <details class="new-item">
         <summary>+ New issue</summary>
         <form>
-          <input type="text" placeholder="Issue title" required>
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" placeholder="Issue title" required>
+          </div>
 
-          <textarea placeholder="Description (optional)" rows="2"></textarea>
+          <div class="form-group">
+            <label>Description (optional)</label>
+            <textarea placeholder="Description (optional)" rows="2"></textarea>
+          </div>
 
-          <select name="type">
-            <option value="task">Task</option>
-            <option value="bug">Bug</option>
-            <option value="story">Story</option>
-          </select>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Type</label>
+              <select name="type">
+                <option value="task">Task</option>
+                <option value="bug">Bug</option>
+                <option value="story">Story</option>
+              </select>
+            </div>
 
-          <select name="sprint">
-            <option value="">Backlog (unscheduled)</option>
-          </select>
+            <div class="form-group flex-1">
+              <label>Sprint</label>
+              <select name="sprint">
+                <option value="" selected>Backlog (unscheduled)</option>
+              </select>
+            </div>
+          </div>
 
-          <select name="priority">
-            <option value="">Priority</option>
-            <option value="Low">Low</option>
-            <option value="Normal">Normal</option>
-            <option value="Medium" selected>Medium</option>
-            <option value="High">High</option>
-          </select>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Priority</label>
+              <select name="priority">
+                <option value="Low">Low</option>
+                <option value="Normal">Normal</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
 
-          <select name="assignee">
-            <option value="">Assignee</option>
-          </select>
+            <div class="form-group flex-1">
+              <label>Assignee</label>
+              <select name="assignee">
+                <option value="" selected>Unassigned</option>
+              </select>
+            </div>
+          </div>
 
-          <select name="status">
-            <option value="">State</option>
-            <option value="todo" selected>To Do</option>
-            <option value="progress">In Progress</option>
-            <option value="review">Review</option>
-            <option value="done">Done</option>
-          </select>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>State</label>
+              <select name="status">
+                <option value="todo" selected>To Do</option>
+                <option value="progress">In Progress</option>
+                <option value="review">Review</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
 
-          <input type="number" placeholder="Story points" min="0" step="1">
+            <div class="form-group flex-1">
+              <label>Story Points</label>
+              <input type="number" placeholder="Story points" min="0" step="1">
+            </div>
+          </div>
 
           <button type="submit">Create issue</button>
         </form>

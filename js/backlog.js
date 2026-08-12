@@ -16,13 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Populate assignee options in new issue form
   function populateAssigneeSelects() {
     if (issueForm) {
-      const select = issueForm.querySelector('select[name="assignee"]') || issueForm.querySelectorAll('select')[3];
+      const select = issueForm.querySelector('select[name="assignee"]');
       if (select) {
-        let html = '<option value="">Assignee</option>';
+        let html = '<option value="">Unassigned</option>';
         usersList.forEach(u => {
           html += `<option value="${u.id}">${escapeHTML(u.name)}</option>`;
         });
-        html += '<option value="">Unassigned</option>';
         select.innerHTML = html;
       }
     }
@@ -33,16 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const li = document.createElement('li');
     li.dataset.id = issue.id;
 
-    // Only backlog issues should be draggable
     if (!issue.sprint_id) {
       li.setAttribute('draggable', 'true');
     }
 
     let assigneeOptions = '';
     usersList.forEach(u => {
-      assigneeOptions += `<option value="${u.id}" ${parseInt(issue.assignee_id) === parseInt(u.id) ? 'selected' : ''}>${escapeHTML(u.initials)}</option>`;
+      assigneeOptions += `<option value="${u.id}" ${parseInt(issue.assignee_id) === parseInt(u.id) ? 'selected' : ''}>${escapeHTML(u.name)}</option>`;
     });
-    assigneeOptions += `<option value="" ${!issue.assignee_id ? 'selected' : ''}>–</option>`;
+    assigneeOptions += `<option value="" ${!issue.assignee_id ? 'selected' : ''}>Unassigned</option>`;
 
     let sprintOptions = '';
     sprintsList.forEach(s => {
@@ -70,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <option value="review" ${issue.status === 'review' ? 'selected' : ''}>Review</option>
         <option value="done" ${issue.status === 'done' ? 'selected' : ''}>Done</option>
       </select>
-      <button class="delete-btn">&times;</button>
+      <button class="delete-btn" aria-label="Delete issue" title="Delete issue">&times;</button>
     `;
     return li;
   }
@@ -107,6 +105,27 @@ document.addEventListener('DOMContentLoaded', () => {
         main.insertBefore(sprintEl, backlogDetails);
       });
 
+      // Inject backlog row header in static Backlog section
+      if (backlogDetails) {
+        backlogDetails.querySelectorAll('.backlog-row-header').forEach(h => h.remove());
+        const ul = backlogDetails.querySelector('ul');
+        if (ul) {
+          const header = document.createElement('div');
+          header.className = 'backlog-row-header';
+          header.innerHTML = `
+            <span class="tag-spacer"></span>
+            <span class="title-header">Title</span>
+            <span class="sprint-header">Sprint</span>
+            <span class="priority-header">Priority</span>
+            <span class="assignee-header">Assignee</span>
+            <span class="points-header">Points</span>
+            <span class="status-header">Status</span>
+            <span class="action-spacer"></span>
+          `;
+          backlogDetails.insertBefore(header, ul);
+        }
+      }
+
       // Organize tasks into sprints or backlog in database order
       tasks.forEach(task => {
         const row = createIssueRow(task);
@@ -129,16 +148,26 @@ document.addEventListener('DOMContentLoaded', () => {
       updateSprintIssueCounts();
     } catch (err) {
       console.error('Error loading backlog data:', err);
+      showBacklogLoadError();
     }
+  }
+
+  function showBacklogLoadError() {
+    const errorNotice = document.createElement('div');
+    errorNotice.className = 'home-error-state';
+    errorNotice.textContent = 'Unable to load the backlog. Please refresh and try again.';
+    main.innerHTML = '';
+    main.appendChild(errorNotice);
   }
 
   loadData();
 
-  // Create new sprint in database with validations
+  // Create new sprint in database
   if (sprintForm) {
     sprintForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const nameInput = sprintForm.querySelector('input[type="text"]');
+      const submitBtn = sprintForm.querySelector('button[type="submit"]');
+      const nameInput = sprintForm.querySelector('input[placeholder="Sprint name"]');
       const dateInputs = sprintForm.querySelectorAll('input[type="date"]');
       const goalTextarea = sprintForm.querySelector('textarea');
 
@@ -160,6 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      if (submitBtn) submitBtn.disabled = true;
+
       fetch('/sprints', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -171,7 +202,9 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       })
       .then(res => {
-        if (!res.ok) throw new Error('Failed to create sprint');
+        if (!res.ok) {
+          return res.json().then(err => { throw new Error(err.error || 'Failed to create sprint'); });
+        }
         return res.json();
       })
       .then(newSprint => {
@@ -184,29 +217,31 @@ document.addEventListener('DOMContentLoaded', () => {
         updateNewIssueSprintOptions();
         updateAllIssueSprintSelects();
         sprintForm.reset();
+        if (submitBtn) submitBtn.disabled = false;
         sprintForm.closest('details').removeAttribute('open');
       })
       .catch(err => {
-        alert('Failed to create sprint on server. Please try again.');
+        if (submitBtn) submitBtn.disabled = false;
+        alert(err.message || 'Failed to create sprint on server. Please try again.');
         console.error('Error creating sprint:', err);
       });
     });
   }
 
-  // Create new task in database with validations
+  // Create new task in database
   if (issueForm) {
     issueForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      
+      const submitBtn = issueForm.querySelector('button[type="submit"]');
       const titleInput = issueForm.querySelector('input[placeholder="Issue title"]');
       const descTextarea = issueForm.querySelector('textarea');
       const pointsInput = issueForm.querySelector('input[type="number"]');
 
-      const typeSelect = issueForm.querySelector('select[name="type"]') || issueForm.querySelectorAll('select')[0];
-      const sprintSelect = issueForm.querySelector('select[name="sprint"]') || issueForm.querySelectorAll('select')[1];
-      const prioritySelect = issueForm.querySelector('select[name="priority"]') || issueForm.querySelectorAll('select')[2];
-      const assigneeSelect = issueForm.querySelector('select[name="assignee"]') || issueForm.querySelectorAll('select')[3];
-      const statusSelect = issueForm.querySelector('select[name="status"]') || issueForm.querySelectorAll('select')[4];
+      const typeSelect = issueForm.querySelector('select[name="type"]');
+      const sprintSelect = issueForm.querySelector('select[name="sprint"]');
+      const prioritySelect = issueForm.querySelector('select[name="priority"]');
+      const assigneeSelect = issueForm.querySelector('select[name="assignee"]');
+      const statusSelect = issueForm.querySelector('select[name="status"]');
 
       const title = titleInput ? titleInput.value.trim() : '';
       const desc = descTextarea ? descTextarea.value.trim() : '';
@@ -238,6 +273,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      if (submitBtn) submitBtn.disabled = true;
+
       fetch('/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -253,7 +290,9 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       })
       .then(r => {
-        if (!r.ok) throw new Error('Create task failed');
+        if (!r.ok) {
+          return r.json().then(err => { throw new Error(err.error || 'Failed to create task'); });
+        }
         return r.json();
       })
       .then(newIssue => {
@@ -278,10 +317,12 @@ document.addEventListener('DOMContentLoaded', () => {
         populateAssigneeSelects();
         updateNewIssueSprintOptions();
 
+        if (submitBtn) submitBtn.disabled = false;
         issueForm.closest('details').removeAttribute('open');
       })
       .catch(err => {
-        alert('Failed to create task on server. Please try again.');
+        if (submitBtn) submitBtn.disabled = false;
+        alert(err.message || 'Failed to create task on server. Please try again.');
         console.error('Error creating task:', err);
       });
     });
@@ -324,13 +365,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!sprintEl || !sprintEl.dataset.sprintId) return;
 
       const sprintId = sprintEl.dataset.sprintId;
+      target.disabled = true;
+
       fetch(`/sprints/${sprintId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'In Progress' })
       })
       .then(res => {
-        if (!res.ok) throw new Error('Failed to start sprint');
+        if (!res.ok) return res.json().then(err => { throw new Error(err.error || 'Failed to start sprint'); });
         return res.json();
       })
       .then(updatedSprint => {
@@ -348,7 +391,8 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSprintIssueCounts();
       })
       .catch(err => {
-        alert('Failed to start sprint on server.');
+        target.disabled = false;
+        alert(err.message || 'Failed to start sprint on server.');
         console.error('Start sprint error:', err);
       });
       return;
@@ -362,13 +406,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!sprintEl || !sprintEl.dataset.sprintId) return;
 
       const sprintId = sprintEl.dataset.sprintId;
+      target.disabled = true;
+
       fetch(`/sprints/${sprintId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'Closed' })
       })
       .then(res => {
-        if (!res.ok) throw new Error('Failed to complete sprint');
+        if (!res.ok) return res.json().then(err => { throw new Error(err.error || 'Failed to complete sprint'); });
         return res.json();
       })
       .then(updatedSprint => {
@@ -386,7 +432,8 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSprintIssueCounts();
       })
       .catch(err => {
-        alert('Failed to complete sprint on server.');
+        target.disabled = false;
+        alert(err.message || 'Failed to complete sprint on server.');
         console.error('Complete sprint error:', err);
       });
       return;
@@ -436,6 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ev.preventDefault();
         ev.stopPropagation();
 
+        const submitEditBtn = editForm.querySelector('.save-edit-sprint-btn');
         const name = editForm.querySelector('.edit-sprint-name').value.trim();
         const start = editForm.querySelector('.edit-sprint-start').value;
         const end = editForm.querySelector('.edit-sprint-end').value;
@@ -454,13 +502,15 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
+        if (submitEditBtn) submitEditBtn.disabled = true;
+
         fetch(`/sprints/${sprintId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, start_date: start, end_date: end, goal })
         })
         .then(res => {
-          if (!res.ok) throw new Error('Failed to update sprint');
+          if (!res.ok) return res.json().then(err => { throw new Error(err.error || 'Failed to update sprint'); });
           return res.json();
         })
         .then(updatedSprint => {
@@ -476,7 +526,8 @@ document.addEventListener('DOMContentLoaded', () => {
           editForm.remove();
         })
         .catch(err => {
-          alert('Failed to save sprint changes on server.');
+          if (submitEditBtn) submitEditBtn.disabled = false;
+          alert(err.message || 'Failed to save sprint changes on server.');
           console.error('Save sprint edit error:', err);
         });
       });
@@ -526,7 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ sprint_id: newSprintId })
       })
       .then(res => {
-        if (!res.ok) throw new Error('Update failed');
+        if (!res.ok) return res.json().then(err => { throw new Error(err.error || 'Failed to update sprint assignment'); });
         return res.json();
       })
       .then(updatedIssue => {
@@ -534,7 +585,7 @@ document.addEventListener('DOMContentLoaded', () => {
         target.value = updatedIssue.sprint_id || '';
       })
       .catch(err => {
-        alert('Failed to update task sprint on server. Reverting.');
+        alert(err.message || 'Failed to update task sprint on server. Reverting.');
         appendIssueToSprintUI(li, previousValue);
         updateSprintIssueCounts();
         if (previousValue) {
@@ -573,7 +624,7 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify(updates)
       })
       .then(res => {
-        if (!res.ok) throw new Error('Update failed');
+        if (!res.ok) return res.json().then(err => { throw new Error(err.error || 'Update failed'); });
         return res.json();
       })
       .then(updatedIssue => {
@@ -595,7 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       })
       .catch(err => {
-        alert('Failed to update task on server. Reverting.');
+        alert(err.message || 'Failed to update task on server. Reverting.');
         if (updates.status !== undefined) {
           target.value = previousValue;
           target.dataset.status = previousValue;
@@ -779,6 +830,16 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="count">0 issues</span>
         </div>
       </summary>
+      <div class="backlog-row-header">
+        <span class="tag-spacer"></span>
+        <span class="title-header">Title</span>
+        <span class="sprint-header">Sprint</span>
+        <span class="priority-header">Priority</span>
+        <span class="assignee-header">Assignee</span>
+        <span class="points-header">Points</span>
+        <span class="status-header">Status</span>
+        <span class="action-spacer"></span>
+      </div>
       <ul></ul>
     `;
     return details;
@@ -792,7 +853,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sprintsList.forEach(s => {
       html += `<option value="${s.id}">Sprint ${s.id} — ${escapeHTML(s.name)}</option>`;
     });
-    html += '<option value="">Backlog (unscheduled)</option>';
+    html += '<option value="" selected>Backlog (unscheduled)</option>';
     select.innerHTML = html;
   }
 

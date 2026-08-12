@@ -373,7 +373,7 @@ main {
   width: 85px;
 }
 .sprint .who {
-  width: 52px;
+  width: 110px;
   text-align: center;
   color: #822f3e;
   font-weight: 700;
@@ -596,6 +596,88 @@ main {
 }
 .hidden {
   display: none !important;
+}
+
+/* Labeled Forms Layout Rules */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.form-group label {
+  font-size: 11px;
+  font-weight: bold;
+  color: #822f3e;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
+}
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+.flex-1 {
+  flex: 1;
+}
+
+/* Backlog Column Headers Row Rules */
+.backlog-row-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px;
+  background: #faf9f8;
+  border-bottom: 1px solid #e9dfde;
+  font-size: 11px;
+  font-weight: 700;
+  color: #8a7b7f;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.backlog-row-header .tag-spacer {
+  width: 20px;
+  flex-shrink: 0;
+}
+.backlog-row-header .title-header {
+  flex: 1;
+  text-align: left;
+}
+.backlog-row-header .sprint-header {
+  width: 90px;
+  flex-shrink: 0;
+  text-align: left;
+}
+.backlog-row-header .priority-header {
+  width: 85px;
+  flex-shrink: 0;
+  text-align: left;
+}
+.backlog-row-header .assignee-header {
+  width: 110px;
+  flex-shrink: 0;
+  text-align: left;
+}
+.backlog-row-header .points-header {
+  width: 46px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.backlog-row-header .status-header {
+  width: 110px;
+  flex-shrink: 0;
+  text-align: left;
+}
+.backlog-row-header .action-spacer {
+  width: 24px;
+  flex-shrink: 0;
+}
+
+/* Double-submission button disable protection style */
+button:disabled, select:disabled, input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /*# sourceMappingURL=backlog.css.map */

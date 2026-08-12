@@ -145,14 +145,14 @@ app.get('/tasks/:id', requireAuth, async (req, res) => {
 
 // Create task
 app.post('/tasks', requireAuth, async (req, res) => {
-  const { title, description, type, priority, status, assignee_id, story_points } = req.body;
+  const { title, description, type, priority, status, assignee_id, story_points, sprint_id } = req.body;
   if (!title) return res.status(400).json({ error: 'Title required' });
 
   try {
     const result = await pool.query(
-      `INSERT INTO tasks (title, description, type, priority, status, assignee_id, story_points)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-      [title, description || '', type || 'task', priority || 'Medium', status || 'todo', assignee_id || null, story_points || 0]
+      `INSERT INTO tasks (title, description, type, priority, status, assignee_id, story_points, sprint_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+      [title, description || '', type || 'task', priority || 'Medium', status || 'todo', assignee_id || null, story_points || 0, sprint_id ? parseInt(sprint_id) : null]
     );
     const { rows } = await pool.query(`
       SELECT t.*, u.name AS assignee_name, u.initials AS assignee_initials
@@ -166,7 +166,7 @@ app.post('/tasks', requireAuth, async (req, res) => {
 
 // Update task
 app.put('/tasks/:id', requireAuth, async (req, res) => {
-  const { title, description, type, priority, status, assignee_id, story_points } = req.body;
+  const { title, description, type, priority, status, assignee_id, story_points, sprint_id } = req.body;
   try {
     const fields = [];
     const values = [];
@@ -179,6 +179,7 @@ app.put('/tasks/:id', requireAuth, async (req, res) => {
     if (status !== undefined) { fields.push(`status = $${i++}`); values.push(status); }
     if (assignee_id !== undefined) { fields.push(`assignee_id = $${i++}`); values.push(assignee_id ? parseInt(assignee_id) : null); }
     if (story_points !== undefined) { fields.push(`story_points = $${i++}`); values.push(story_points ? parseInt(story_points) : 0); }
+    if (sprint_id !== undefined) { fields.push(`sprint_id = $${i++}`); values.push(sprint_id ? parseInt(sprint_id) : null); }
 
     if (fields.length === 0) return res.status(400).json({ error: 'No fields' });
 
@@ -207,10 +208,95 @@ app.delete('/tasks/:id', requireAuth, async (req, res) => {
   }
 });
 
+// Get all sprints
+app.get('/sprints', requireAuth, async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM sprints ORDER BY id');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Get one sprint
+app.get('/sprints/:id', requireAuth, async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM sprints WHERE id = $1', [req.params.id]);
+    if (!rows.length) return res.status(404).json({ error: 'Not found' });
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Create sprint
+app.post('/sprints', requireAuth, async (req, res) => {
+  const { name, start_date, end_date, goal } = req.body;
+  if (!name || !start_date || !end_date) {
+    return res.status(400).json({ error: 'Name, start date, and end date are required' });
+  }
+  try {
+    const { rows } = await pool.query(
+      `INSERT INTO sprints (name, start_date, end_date, goal)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [name, start_date, end_date, goal || '']
+    );
+    res.status(201).json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Update sprint
+app.put('/sprints/:id', requireAuth, async (req, res) => {
+  const { name, start_date, end_date, goal } = req.body;
+  try {
+    const fields = [];
+    const values = [];
+    let i = 1;
+
+    if (name !== undefined) { fields.push(`name = $${i++}`); values.push(name); }
+    if (start_date !== undefined) { fields.push(`start_date = $${i++}`); values.push(start_date); }
+    if (end_date !== undefined) { fields.push(`end_date = $${i++}`); values.push(end_date); }
+    if (goal !== undefined) { fields.push(`goal = $${i++}`); values.push(goal); }
+
+    if (fields.length === 0) return res.status(400).json({ error: 'No fields' });
+
+    values.push(req.params.id);
+    const { rowCount } = await pool.query(`UPDATE sprints SET ${fields.join(', ')} WHERE id = $${i}`, values);
+    if (rowCount === 0) return res.status(404).json({ error: 'Not found' });
+
+    const { rows } = await pool.query('SELECT * FROM sprints WHERE id = $1', [req.params.id]);
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Delete sprint
+app.delete('/sprints/:id', requireAuth, async (req, res) => {
+  try {
+    const { rowCount } = await pool.query('DELETE FROM sprints WHERE id = $1', [req.params.id]);
+    if (rowCount === 0) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Start app
 async function startServer() {
   try {
     await pool.query('SELECT NOW()');
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS sprints (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        start_date VARCHAR(50) NOT NULL,
+        end_date VARCHAR(50) NOT NULL,
+        goal TEXT
+      )
+    `);
     await pool.query(`
       CREATE TABLE IF NOT EXISTS tasks (
         id SERIAL PRIMARY KEY,
@@ -220,9 +306,13 @@ async function startServer() {
         priority VARCHAR(50) NOT NULL DEFAULT 'Medium',
         status VARCHAR(50) NOT NULL DEFAULT 'todo',
         assignee_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-        story_points INTEGER DEFAULT 0
+        story_points INTEGER DEFAULT 0,
+        sprint_id INTEGER REFERENCES sprints(id) ON DELETE SET NULL
       )
     `);
+    await pool.query(`
+      ALTER TABLE tasks ADD COLUMN IF NOT EXISTS sprint_id INTEGER REFERENCES sprints(id) ON DELETE SET NULL
+    `).catch(() => {});
   } catch (err) {
     console.error('DB failed:', err.message);
   }

@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const sprintForm = document.querySelector('.backlog-header details:nth-of-type(1) form');
   const issueForm = document.querySelector('.backlog-header details:nth-of-type(2) form');
 
-  const customSprints = [];
+  let sprintsList = [];
   let usersList = [];
 
   const sprintDetails = Array.from(document.querySelectorAll('details.sprint'));
@@ -106,13 +106,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     assigneeOptions += `<option value="" ${!issue.assignee_id ? 'selected' : ''}>–</option>`;
 
+    let sprintOptions = '';
+    sprintsList.forEach(s => {
+      sprintOptions += `<option value="${s.id}" ${parseInt(issue.sprint_id) === parseInt(s.id) ? 'selected' : ''}>${escapeHTML(s.name)}</option>`;
+    });
+    sprintOptions += `<option value="" ${!issue.sprint_id ? 'selected' : ''}>Backlog</option>`;
+
     li.innerHTML = `
       <span class="tag" data-type="${issue.type}">${issue.type === 'story' ? 'S' : (issue.type === 'bug' ? 'B' : 'T')}</span>
       <span class="title">${escapeHTML(issue.title)}</span>
-      <select class="issue-sprint">
-        <option value="12">Sprint 12</option>
-        <option value="13">Sprint 13</option>
-        <option value="" selected>Backlog</option>
+      <select class="issue-sprint" data-sprint="${issue.sprint_id || ''}">
+        ${sprintOptions}
       </select>
       <select class="priority" data-priority="${issue.priority}">
         <option value="Low" ${issue.priority === 'Low' ? 'selected' : ''}>Low</option>
@@ -132,9 +136,18 @@ document.addEventListener('DOMContentLoaded', () => {
     return li;
   }
 
-  // Load database users and tasks
+  // Load database users, sprints, and tasks
   async function loadData() {
-    document.querySelectorAll('details.sprint ul').forEach(ul => ul.innerHTML = '');
+    // Clear dynamic sprint details, keep only backlogDetails
+    document.querySelectorAll('details.sprint').forEach(el => {
+      if (el !== backlogDetails) {
+        el.remove();
+      } else {
+        const ul = el.querySelector('ul');
+        if (ul) ul.innerHTML = '';
+      }
+    });
+
     try {
       const usersRes = await fetch('/users');
       if (!usersRes.ok) throw new Error('Failed to fetch users');
@@ -142,53 +155,92 @@ document.addEventListener('DOMContentLoaded', () => {
       
       populateAssigneeSelects();
 
+      const sprintsRes = await fetch('/sprints');
+      if (!sprintsRes.ok) throw new Error('Failed to fetch sprints');
+      sprintsList = await sprintsRes.json();
+
       const tasksRes = await fetch('/tasks');
       if (!tasksRes.ok) throw new Error('Failed to fetch tasks');
       const tasks = await tasksRes.json();
 
-      if (backlogDetails) {
-        const ul = backlogDetails.querySelector('ul');
-        if (ul) {
-          tasks.forEach(task => ul.appendChild(createIssueRow(task)));
+      // Render sprint sections
+      sprintsList.forEach(s => {
+        const sprintEl = createSprintElement(s);
+        main.insertBefore(sprintEl, backlogDetails);
+      });
+
+      // Organize tasks into sprints or backlog
+      tasks.forEach(task => {
+        const row = createIssueRow(task);
+        if (task.sprint_id) {
+          const targetSprint = Array.from(document.querySelectorAll('details.sprint')).find(el => String(el.dataset.sprintId) === String(task.sprint_id));
+          if (targetSprint) {
+            const ul = targetSprint.querySelector('ul');
+            if (ul) ul.appendChild(row);
+          } else {
+            const ul = backlogDetails.querySelector('ul');
+            if (ul) ul.appendChild(row);
+          }
+        } else {
+          const ul = backlogDetails.querySelector('ul');
+          if (ul) ul.appendChild(row);
         }
-      }
+      });
+
+      updateNewIssueSprintOptions();
       updateSprintIssueCounts();
     } catch (err) {
-      console.error('Error loading data:', err);
+      console.error('Error loading backlog data:', err);
     }
   }
 
   loadData();
 
-  // Create local sprint (frontend-only for Phase 4)
+  // Create new sprint in database
   if (sprintForm) {
     sprintForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const name = sprintForm.querySelector('input[type="text"]').value.trim();
-      const dates = sprintForm.querySelectorAll('input[type="date"]');
-      const goal = sprintForm.querySelector('textarea').value.trim();
+      const nameInput = sprintForm.querySelector('input[type="text"]');
+      const dateInputs = sprintForm.querySelectorAll('input[type="date"]');
+      const goalTextarea = sprintForm.querySelector('textarea');
 
-      if (!name || !dates[0].value || !dates[1].value) return;
+      const name = nameInput ? nameInput.value.trim() : '';
+      const startDate = dateInputs[0] ? dateInputs[0].value : '';
+      const endDate = dateInputs[1] ? dateInputs[1].value : '';
+      const goal = goalTextarea ? goalTextarea.value.trim() : '';
 
-      const noSpans = Array.from(document.querySelectorAll('.sprint summary .no'));
-      let maxId = 13;
-      noSpans.forEach(span => {
-        const num = parseInt(span.textContent.replace('Sprint', '').trim());
-        if (!isNaN(num) && num > maxId) maxId = num;
+      if (!name || !startDate || !endDate) return;
+
+      fetch('/sprints', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          start_date: startDate,
+          end_date: endDate,
+          goal
+        })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to create sprint');
+        return res.json();
+      })
+      .then(newSprint => {
+        sprintsList.push(newSprint);
+
+        const sprintEl = createSprintElement(newSprint);
+        if (backlogDetails) main.insertBefore(sprintEl, backlogDetails);
+        else main.appendChild(sprintEl);
+
+        updateNewIssueSprintOptions();
+        updateAllIssueSprintSelects();
+        sprintForm.reset();
+        sprintForm.closest('details').removeAttribute('open');
+      })
+      .catch(err => {
+        alert('Failed to create sprint on server. Please try again.');
+        console.error('Error creating sprint:', err);
       });
-      const nextId = String(maxId + 1);
-
-      const newSprint = { id: nextId, name, startDate: dates[0].value, endDate: dates[1].value, goal };
-      customSprints.push(newSprint);
-
-      const sprintEl = createSprintElement(newSprint);
-      if (backlogDetails) main.insertBefore(sprintEl, backlogDetails);
-      else main.appendChild(sprintEl);
-
-      updateNewIssueSprintOptions();
-      updateAllIssueSprintSelects();
-      sprintForm.reset();
-      sprintForm.closest('details').removeAttribute('open');
     });
   }
 
@@ -202,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const pointsInput = issueForm.querySelector('input[type="number"]');
 
       const typeSelect = issueForm.querySelector('select[name="type"]') || issueForm.querySelectorAll('select')[0];
+      const sprintSelect = issueForm.querySelector('select[name="sprint"]') || issueForm.querySelectorAll('select')[1];
       const prioritySelect = issueForm.querySelector('select[name="priority"]') || issueForm.querySelectorAll('select')[2];
       const assigneeSelect = issueForm.querySelector('select[name="assignee"]') || issueForm.querySelectorAll('select')[3];
       const statusSelect = issueForm.querySelector('select[name="status"]') || issueForm.querySelectorAll('select')[4];
@@ -209,6 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const title = titleInput ? titleInput.value.trim() : '';
       const desc = descTextarea ? descTextarea.value.trim() : '';
       const type = typeSelect ? typeSelect.value : 'task';
+      const sprintId = (sprintSelect && sprintSelect.value) ? parseInt(sprintSelect.value) : null;
       const priority = (prioritySelect && prioritySelect.value) || 'Medium';
       const assigneeId = (assigneeSelect && assigneeSelect.value) ? parseInt(assigneeSelect.value) : null;
       const status = (statusSelect && statusSelect.value) || 'todo';
@@ -226,7 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
           priority,
           assignee_id: assigneeId,
           status,
-          story_points: points
+          story_points: points,
+          sprint_id: sprintId
         })
       })
       .then(r => {
@@ -234,15 +289,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return r.json();
       })
       .then(newIssue => {
-        if (backlogDetails) {
+        const row = createIssueRow(newIssue);
+        if (newIssue.sprint_id) {
+          const targetSprint = Array.from(document.querySelectorAll('details.sprint')).find(el => String(el.dataset.sprintId) === String(newIssue.sprint_id));
+          if (targetSprint) {
+            const ul = targetSprint.querySelector('ul');
+            if (ul) ul.appendChild(row);
+          } else {
+            const ul = backlogDetails.querySelector('ul');
+            if (ul) ul.appendChild(row);
+          }
+        } else {
           const ul = backlogDetails.querySelector('ul');
-          if (ul) ul.appendChild(createIssueRow(newIssue));
+          if (ul) ul.appendChild(row);
         }
+
         updateSprintIssueCounts();
         issueForm.reset();
         
-        // Re-populate assignee select to reset it correctly
         populateAssigneeSelects();
+        updateNewIssueSprintOptions();
 
         issueForm.closest('details').removeAttribute('open');
       })
@@ -263,8 +329,33 @@ document.addEventListener('DOMContentLoaded', () => {
     let previousValue = null;
 
     if (target.classList.contains('issue-sprint')) {
+      previousValue = target.dataset.sprint;
+      const newSprintId = target.value ? parseInt(target.value) : null;
+
+      // Optimistically move card in UI
       appendIssueToSprintUI(li, target.value);
       updateSprintIssueCounts();
+
+      fetch(`/tasks/${li.dataset.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sprint_id: newSprintId })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Update failed');
+        return res.json();
+      })
+      .then(updatedIssue => {
+        target.dataset.sprint = updatedIssue.sprint_id || '';
+        target.value = updatedIssue.sprint_id || '';
+      })
+      .catch(err => {
+        alert('Failed to update task sprint on server. Reverting.');
+        appendIssueToSprintUI(li, previousValue);
+        updateSprintIssueCounts();
+        target.value = previousValue || '';
+        target.dataset.sprint = previousValue || '';
+      });
       return;
     } else if (target.classList.contains('status')) {
       previousValue = target.dataset.status;
@@ -327,22 +418,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Helpers
-  function getSprints() {
-    const list = [{ id: '12', name: 'Sprint 12' }, { id: '13', name: 'Sprint 13' }];
-    customSprints.forEach(s => list.push({ id: s.id, name: `Sprint ${s.id}` }));
-    return list;
-  }
-
   function appendIssueToSprintUI(li, sprintId) {
     const target = Array.from(document.querySelectorAll('details.sprint')).find(el => {
-      if (el.dataset.sprintId === String(sprintId)) return true;
-      const noSpan = el.querySelector('.no');
-      if (noSpan) {
-        if (!sprintId && (noSpan.textContent.trim() === '–' || noSpan.textContent.trim().toLowerCase() === 'backlog')) return true;
-        if (noSpan.textContent.replace('Sprint', '').trim() === String(sprintId)) return true;
+      if (sprintId) {
+        return String(el.dataset.sprintId) === String(sprintId);
+      } else {
+        const noSpan = el.querySelector('.no');
+        const h2 = el.querySelector('h2');
+        return (noSpan && noSpan.textContent.trim() === '–') || (h2 && h2.textContent.trim() === 'Backlog');
       }
-      return false;
     });
 
     if (target) {
@@ -377,14 +461,14 @@ document.addEventListener('DOMContentLoaded', () => {
     details.open = true;
     details.dataset.sprintId = sprint.id;
 
-    const dates = sprint.startDate && sprint.endDate ? `${formatDate(sprint.startDate)} – ${formatDate(sprint.endDate)}` : 'No dates';
+    const dates = sprint.start_date && sprint.end_date ? `${formatDate(sprint.start_date)} – ${formatDate(sprint.end_date)}` : 'No dates';
     details.innerHTML = `
       <summary>
         <span class="no">Sprint ${sprint.id}</span>
         <div>
-          <h2>${sprint.name}</h2>
+          <h2>${escapeHTML(sprint.name)}</h2>
           <p><em>Active</em> ${dates}</p>
-          ${sprint.goal ? `<p class="goal">${sprint.goal}</p>` : ''}
+          ${sprint.goal ? `<p class="goal">${escapeHTML(sprint.goal)}</p>` : ''}
         </div>
         <span class="count">0 issues</span>
       </summary>
@@ -394,16 +478,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateNewIssueSprintOptions() {
-    const select = document.querySelector('.backlog-header details:nth-of-type(2) form select[name="sprint"]') || 
-                   document.querySelector('.backlog-header details:nth-of-type(2) form select:nth-of-type(2)');
+    const select = issueForm ? (issueForm.querySelector('select[name="sprint"]') || issueForm.querySelectorAll('select')[1]) : null;
     if (!select) return;
 
-    let html = `
-      <option value="12">Sprint 12 — Checkout</option>
-      <option value="13">Sprint 13 — Login</option>
-    `;
-    customSprints.forEach(s => {
-      html += `<option value="${s.id}">Sprint ${s.id} — ${s.name}</option>`;
+    let html = '';
+    sprintsList.forEach(s => {
+      html += `<option value="${s.id}">Sprint ${s.id} — ${escapeHTML(s.name)}</option>`;
     });
     html += '<option value="">Backlog (unscheduled)</option>';
     select.innerHTML = html;
@@ -415,8 +495,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const val = select.value;
       let html = '';
-      getSprints().forEach(s => {
-        html += `<option value="${s.id}" ${s.id === val ? 'selected' : ''}>${s.name}</option>`;
+      sprintsList.forEach(s => {
+        html += `<option value="${s.id}" ${String(s.id) === String(val) ? 'selected' : ''}>${escapeHTML(s.name)}</option>`;
       });
       html += `<option value="" ${val === '' ? 'selected' : ''}>Backlog</option>`;
       select.innerHTML = html;

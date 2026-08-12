@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Build issue row element
+  // Build issue row element with deletion button
   function createIssueRow(issue) {
     const li = document.createElement('li');
     li.dataset.id = issue.id;
@@ -132,13 +132,13 @@ document.addEventListener('DOMContentLoaded', () => {
         <option value="review" ${issue.status === 'review' ? 'selected' : ''}>Review</option>
         <option value="done" ${issue.status === 'done' ? 'selected' : ''}>Done</option>
       </select>
+      <button class="delete-btn" style="background: none; border: none; color: #822f3e; font-weight: bold; font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
     `;
     return li;
   }
 
   // Load database users, sprints, and tasks
   async function loadData() {
-    // Clear dynamic sprint details, keep only backlogDetails
     document.querySelectorAll('details.sprint').forEach(el => {
       if (el !== backlogDetails) {
         el.remove();
@@ -268,7 +268,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const status = (statusSelect && statusSelect.value) || 'todo';
       const points = (pointsInput && pointsInput.value) ? parseInt(pointsInput.value) : 0;
 
-      if (!title) return;
+      if (!title) {
+        alert('Title cannot be empty.');
+        return;
+      }
+      if (points < 0) {
+        alert('Story points cannot be negative.');
+        return;
+      }
 
       fetch('/tasks', {
         method: 'POST',
@@ -319,6 +326,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Handle issue deletion in backlog
+  main.addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete-btn')) {
+      const li = e.target.closest('li');
+      if (!li || !li.dataset.id) return;
+
+      if (confirm('Are you sure you want to delete this issue?')) {
+        fetch(`/tasks/${li.dataset.id}`, {
+          method: 'DELETE'
+        })
+        .then(res => {
+          if (!res.ok) throw new Error('Delete failed');
+          return res.json();
+        })
+        .then(() => {
+          li.remove();
+          updateSprintIssueCounts();
+        })
+        .catch(err => {
+          alert('Failed to delete issue on server.');
+          console.error('Delete issue failed:', err);
+        });
+      }
+    }
+  });
+
   // Sync field updates back to the database
   main.addEventListener('change', (e) => {
     const target = e.target;
@@ -368,7 +401,13 @@ document.addEventListener('DOMContentLoaded', () => {
       updates.assignee_id = target.value ? parseInt(target.value) : null;
     } else if (target.classList.contains('points')) {
       previousValue = target.dataset.points;
-      updates.story_points = parseInt(target.value) || 0;
+      const pts = parseInt(target.value);
+      if (isNaN(pts) || pts < 0) {
+        alert('Story points must be a non-negative number.');
+        target.value = previousValue;
+        return;
+      }
+      updates.story_points = pts;
     }
 
     if (Object.keys(updates).length > 0) {

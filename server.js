@@ -146,7 +146,25 @@ app.get('/tasks/:id', requireAuth, async (req, res) => {
 // Create task
 app.post('/tasks', requireAuth, async (req, res) => {
   const { title, description, type, priority, status, assignee_id, story_points, sprint_id } = req.body;
-  if (!title) return res.status(400).json({ error: 'Title required' });
+  
+  if (!title || typeof title !== 'string' || !title.trim()) {
+    return res.status(400).json({ error: 'Title is required and must be a non-empty string' });
+  }
+  if (type !== undefined && !['task', 'bug', 'story'].includes(type)) {
+    return res.status(400).json({ error: 'Invalid issue type' });
+  }
+  if (priority !== undefined && !['Low', 'Normal', 'Medium', 'High'].includes(priority)) {
+    return res.status(400).json({ error: 'Invalid priority value' });
+  }
+  if (status !== undefined && !['todo', 'progress', 'review', 'done'].includes(status)) {
+    return res.status(400).json({ error: 'Invalid status value' });
+  }
+  if (story_points !== undefined) {
+    const pts = parseInt(story_points);
+    if (isNaN(pts) || pts < 0) {
+      return res.status(400).json({ error: 'Story points must be a non-negative number' });
+    }
+  }
 
   try {
     const result = await pool.query(
@@ -160,6 +178,9 @@ app.post('/tasks', requireAuth, async (req, res) => {
     `, [result.rows[0].id]);
     res.status(201).json(rows[0]);
   } catch (err) {
+    if (err.code === '23503') {
+      return res.status(400).json({ error: 'Invalid assignee or sprint reference' });
+    }
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -167,6 +188,26 @@ app.post('/tasks', requireAuth, async (req, res) => {
 // Update task
 app.put('/tasks/:id', requireAuth, async (req, res) => {
   const { title, description, type, priority, status, assignee_id, story_points, sprint_id } = req.body;
+
+  if (title !== undefined && (!title || typeof title !== 'string' || !title.trim())) {
+    return res.status(400).json({ error: 'Title is required and must be a non-empty string' });
+  }
+  if (type !== undefined && !['task', 'bug', 'story'].includes(type)) {
+    return res.status(400).json({ error: 'Invalid issue type' });
+  }
+  if (priority !== undefined && !['Low', 'Normal', 'Medium', 'High'].includes(priority)) {
+    return res.status(400).json({ error: 'Invalid priority value' });
+  }
+  if (status !== undefined && !['todo', 'progress', 'review', 'done'].includes(status)) {
+    return res.status(400).json({ error: 'Invalid status value' });
+  }
+  if (story_points !== undefined) {
+    const pts = parseInt(story_points);
+    if (isNaN(pts) || pts < 0) {
+      return res.status(400).json({ error: 'Story points must be a non-negative number' });
+    }
+  }
+
   try {
     const fields = [];
     const values = [];
@@ -193,6 +234,9 @@ app.put('/tasks/:id', requireAuth, async (req, res) => {
     `, [req.params.id]);
     res.json(rows[0]);
   } catch (err) {
+    if (err.code === '23503') {
+      return res.status(400).json({ error: 'Invalid assignee or sprint reference' });
+    }
     res.status(500).json({ error: 'Server error' });
   }
 });

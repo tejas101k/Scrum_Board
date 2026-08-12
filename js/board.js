@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   }
 
-  // Create card element
+  // Create card element with inline styled delete button
   function createCardElement(task) {
     const card = document.createElement('div');
     card.className = 'card';
@@ -91,7 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const initials = task.assignee_initials || '–';
     card.innerHTML = `
-      <span class="tag">${task.type === 'story' ? 'S' : (task.type === 'bug' ? 'B' : 'T')}</span>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span class="tag">${task.type === 'story' ? 'S' : (task.type === 'bug' ? 'B' : 'T')}</span>
+        <button class="delete-btn" style="background: none; border: none; color: #822f3e; font-weight: bold; font-size: 16px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+      </div>
       <p>${escapeHTML(task.title)}</p>
       <select class="status" data-status="${task.status}">
         <option value="todo" ${task.status === 'todo' ? 'selected' : ''}>To Do</option>
@@ -213,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Handle board status dropdown updates
   board.addEventListener('change', e => {
     if (e.target.classList.contains('status')) {
       const card = e.target.closest('.card');
@@ -248,6 +252,32 @@ document.addEventListener('DOMContentLoaded', () => {
           e.target.value = oldStatus;
           e.target.dataset.status = oldStatus;
           updateCounts();
+        });
+      }
+    }
+  });
+
+  // Handle click on delete button inside board cards
+  board.addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete-btn')) {
+      const card = e.target.closest('.card');
+      if (!card || !card.dataset.id) return;
+
+      if (confirm('Are you sure you want to delete this issue?')) {
+        fetch(`/tasks/${card.dataset.id}`, {
+          method: 'DELETE'
+        })
+        .then(res => {
+          if (!res.ok) throw new Error('Delete failed');
+          return res.json();
+        })
+        .then(() => {
+          card.remove();
+          updateCounts();
+        })
+        .catch(err => {
+          alert('Failed to delete issue on server.');
+          console.error('Delete issue failed:', err);
         });
       }
     }

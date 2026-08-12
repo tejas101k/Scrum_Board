@@ -17,6 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Close header details dropdowns when clicking outside
+  document.addEventListener('click', (e) => {
+    newItems.forEach(details => {
+      if (details.open && !details.contains(e.target)) {
+        details.removeAttribute('open');
+      }
+    });
+  });
+
   let sprintsList = [];
   let usersList = [];
 

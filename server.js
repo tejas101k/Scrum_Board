@@ -122,7 +122,7 @@ app.get('/tasks', requireAuth, async (req, res) => {
   try {
     const { rows } = await pool.query(`
       SELECT t.*, u.name AS assignee_name, u.initials AS assignee_initials
-      FROM tasks t LEFT JOIN users u ON t.assignee_id = u.id ORDER BY t.id
+      FROM tasks t LEFT JOIN users u ON t.assignee_id = u.id ORDER BY t.position ASC, t.id ASC
     `);
     res.json(rows);
   } catch (err) {
@@ -168,10 +168,13 @@ app.post('/tasks', requireAuth, async (req, res) => {
   }
 
   try {
+    const nextPosRes = await pool.query('SELECT COALESCE(MAX(position), 0) AS max_pos FROM tasks WHERE sprint_id IS NULL');
+    const nextPos = nextPosRes.rows[0].max_pos + 1;
+
     const result = await pool.query(
-      `INSERT INTO tasks (title, description, type, priority, status, assignee_id, story_points, sprint_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-      [title, description || '', type || 'task', priority || 'Medium', status || 'todo', assignee_id || null, story_points || 0, sprint_id ? parseInt(sprint_id) : null]
+      `INSERT INTO tasks (title, description, type, priority, status, assignee_id, story_points, sprint_id, position)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+      [title, description || '', type || 'task', priority || 'Medium', status || 'todo', assignee_id || null, story_points || 0, sprint_id ? parseInt(sprint_id) : null, nextPos]
     );
     const { rows } = await pool.query(`
       SELECT t.*, u.name AS assignee_name, u.initials AS assignee_initials
@@ -221,7 +224,17 @@ app.put('/tasks/:id', requireAuth, async (req, res) => {
     if (status !== undefined) { fields.push(`status = $${i++}`); values.push(status); }
     if (assignee_id !== undefined) { fields.push(`assignee_id = $${i++}`); values.push(assignee_id ? parseInt(assignee_id) : null); }
     if (story_points !== undefined) { fields.push(`story_points = $${i++}`); values.push(story_points ? parseInt(story_points) : 0); }
-    if (sprint_id !== undefined) { fields.push(`sprint_id = $${i++}`); values.push(sprint_id ? parseInt(sprint_id) : null); }
+    if (sprint_id !== undefined) {
+      fields.push(`sprint_id = $${i++}`);
+      values.push(sprint_id ? parseInt(sprint_id) : null);
+
+      if (sprint_id === null) {
+        const nextPosRes = await pool.query('SELECT COALESCE(MAX(position), 0) AS max_pos FROM tasks WHERE sprint_id IS NULL');
+        const nextPos = nextPosRes.rows[0].max_pos + 1;
+        fields.push(`position = $${i++}`);
+        values.push(nextPos);
+      }
+    }
 
     if (fields.length === 0) return res.status(400).json({ error: 'No fields' });
 
@@ -238,6 +251,29 @@ app.put('/tasks/:id', requireAuth, async (req, res) => {
     if (err.code === '23503') {
       return res.status(400).json({ error: 'Invalid assignee or sprint reference' });
     }
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Reorder backlog tasks
+app.put('/tasks/reorder', requireAuth, async (req, res) => {
+  const { ids } = req.body;
+  if (!ids || !Array.isArray(ids)) {
+    return res.status(400).json({ error: 'Missing or invalid ids array' });
+  }
+
+  try {
+    await pool.query('BEGIN');
+    for (let pos = 1; pos <= ids.length; pos++) {
+      const id = parseInt(ids[pos - 1]);
+      if (!isNaN(id)) {
+        await pool.query('UPDATE tasks SET position = $1, sprint_id = NULL WHERE id = $2', [pos, id]);
+      }
+    }
+    await pool.query('COMMIT');
+    res.json({ success: true });
+  } catch (err) {
+    await pool.query('ROLLBACK');
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -363,11 +399,15 @@ async function startServer() {
         status VARCHAR(50) NOT NULL DEFAULT 'todo',
         assignee_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
         story_points INTEGER DEFAULT 0,
-        sprint_id INTEGER REFERENCES sprints(id) ON DELETE SET NULL
+        sprint_id INTEGER REFERENCES sprints(id) ON DELETE SET NULL,
+        position INTEGER DEFAULT 0
       )
     `);
     await pool.query(`
       ALTER TABLE tasks ADD COLUMN IF NOT EXISTS sprint_id INTEGER REFERENCES sprints(id) ON DELETE SET NULL
+    `).catch(() => {});
+    await pool.query(`
+      ALTER TABLE tasks ADD COLUMN IF NOT EXISTS position INTEGER DEFAULT 0
     `).catch(() => {});
   } catch (err) {
     console.error('DB failed:', err.message);

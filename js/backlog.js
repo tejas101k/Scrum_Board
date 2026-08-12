@@ -82,6 +82,15 @@ document.addEventListener('DOMContentLoaded', () => {
     return (noSpan && noSpan.textContent.trim() === '–') || (h2 && h2.textContent.trim() === 'Backlog');
   });
 
+  // Inject backlog dragover styles dynamically
+  const style = document.createElement('style');
+  style.textContent = `
+    .backlog-drag-over {
+      border-top: 2px solid #822f3e !important;
+    }
+  `;
+  document.head.appendChild(style);
+
   function escapeHTML(str) {
     if (!str) return '';
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -102,10 +111,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Build issue row element with deletion button
+  // Build issue row element with deletion and conditional draggability
   function createIssueRow(issue) {
     const li = document.createElement('li');
     li.dataset.id = issue.id;
+
+    // Only backlog issues should be draggable
+    if (!issue.sprint_id) {
+      li.setAttribute('draggable', 'true');
+    }
 
     let assigneeOptions = '';
     usersList.forEach(u => {
@@ -176,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         main.insertBefore(sprintEl, backlogDetails);
       });
 
-      // Organize tasks into sprints or backlog
+      // Organize tasks into sprints or backlog in database order
       tasks.forEach(task => {
         const row = createIssueRow(task);
         if (task.sprint_id) {
@@ -203,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loadData();
 
-  // Create new sprint in database
+  // Create new sprint in database with validations
   if (sprintForm) {
     sprintForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -216,7 +230,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const endDate = dateInputs[1] ? dateInputs[1].value : '';
       const goal = goalTextarea ? goalTextarea.value.trim() : '';
 
-      if (!name || !startDate || !endDate) return;
+      if (!name) {
+        alert('Sprint name cannot be empty.');
+        return;
+      }
+      if (!startDate || !endDate) {
+        alert('Start date and End date are required.');
+        return;
+      }
+      if (new Date(endDate) < new Date(startDate)) {
+        alert('End date must not be before start date.');
+        return;
+      }
 
       fetch('/sprints', {
         method: 'POST',
@@ -251,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Create new task in database
+  // Create new task in database with validations
   if (issueForm) {
     issueForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -279,8 +304,20 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Title cannot be empty.');
         return;
       }
-      if (points < 0) {
-        alert('Story points cannot be negative.');
+      if (isNaN(points) || points < 0) {
+        alert('Story points must be a non-negative number.');
+        return;
+      }
+      if (!['task', 'bug', 'story'].includes(type)) {
+        alert('Invalid issue type selection.');
+        return;
+      }
+      if (!['Low', 'Normal', 'Medium', 'High'].includes(priority)) {
+        alert('Invalid priority selection.');
+        return;
+      }
+      if (!['todo', 'progress', 'review', 'done'].includes(status)) {
+        alert('Invalid state selection.');
         return;
       }
 
@@ -438,7 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 4. Toggle Edit Sprint Form Inline
+    // 4. Toggle Edit Sprint Form Inline with Validations
     if (target.classList.contains('edit-sprint-btn')) {
       e.stopPropagation();
       e.preventDefault();
@@ -488,7 +525,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const end = editForm.querySelector('.edit-sprint-end').value;
         const goal = editForm.querySelector('.edit-sprint-goal').value.trim();
 
-        if (!name || !start || !end) return;
+        if (!name) {
+          alert('Sprint name cannot be empty.');
+          return;
+        }
+        if (!start || !end) {
+          alert('Start date and End date are required.');
+          return;
+        }
+        if (new Date(end) < new Date(start)) {
+          alert('End date must not be before start date.');
+          return;
+        }
 
         fetch(`/sprints/${sprintId}`, {
           method: 'PUT',
@@ -549,6 +597,13 @@ document.addEventListener('DOMContentLoaded', () => {
       appendIssueToSprintUI(li, target.value);
       updateSprintIssueCounts();
 
+      // Maintain dragability: only backlog items are draggable
+      if (newSprintId) {
+        li.removeAttribute('draggable');
+      } else {
+        li.setAttribute('draggable', 'true');
+      }
+
       fetch(`/tasks/${li.dataset.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -566,6 +621,11 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Failed to update task sprint on server. Reverting.');
         appendIssueToSprintUI(li, previousValue);
         updateSprintIssueCounts();
+        if (previousValue) {
+          li.removeAttribute('draggable');
+        } else {
+          li.setAttribute('draggable', 'true');
+        }
         target.value = previousValue || '';
         target.dataset.sprint = previousValue || '';
       });
@@ -636,6 +696,84 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   });
+
+  // Drag and drop event listeners for backlog reordering
+  let draggedRow = null;
+
+  main.addEventListener('dragstart', (e) => {
+    const li = e.target.closest('li');
+    if (li && backlogDetails && backlogDetails.contains(li)) {
+      draggedRow = li;
+      li.style.opacity = '0.5';
+      e.dataTransfer.setData('text/plain', '');
+    }
+  });
+
+  main.addEventListener('dragend', (e) => {
+    const li = e.target.closest('li');
+    if (li) {
+      li.style.opacity = '';
+    }
+    draggedRow = null;
+    document.querySelectorAll('.backlog-drag-over').forEach(el => el.classList.remove('backlog-drag-over'));
+  });
+
+  main.addEventListener('dragover', (e) => {
+    const li = e.target.closest('li');
+    if (li && draggedRow && backlogDetails && backlogDetails.contains(li) && li !== draggedRow) {
+      e.preventDefault();
+    }
+  });
+
+  main.addEventListener('dragenter', (e) => {
+    const li = e.target.closest('li');
+    if (li && draggedRow && backlogDetails && backlogDetails.contains(li) && li !== draggedRow) {
+      li.classList.add('backlog-drag-over');
+    }
+  });
+
+  main.addEventListener('dragleave', (e) => {
+    const li = e.target.closest('li');
+    if (li && !li.contains(e.relatedTarget)) {
+      li.classList.remove('backlog-drag-over');
+    }
+  });
+
+  main.addEventListener('drop', (e) => {
+    const li = e.target.closest('li');
+    if (li && draggedRow && backlogDetails && backlogDetails.contains(li) && li !== draggedRow) {
+      e.preventDefault();
+      li.classList.remove('backlog-drag-over');
+      
+      const rect = li.getBoundingClientRect();
+      const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+      li.parentElement.insertBefore(draggedRow, next ? li.nextSibling : li);
+      
+      saveBacklogOrder();
+    }
+  });
+
+  function saveBacklogOrder() {
+    if (!backlogDetails) return;
+    const backlogUl = backlogDetails.querySelector('ul');
+    if (!backlogUl) return;
+
+    const ids = Array.from(backlogUl.querySelectorAll('li')).map(li => parseInt(li.dataset.id));
+    
+    fetch('/tasks/reorder', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Reorder failed');
+      return res.json();
+    })
+    .catch(err => {
+      alert('Failed to save backlog order on server.');
+      console.error('Save backlog order error:', err);
+    });
+  }
 
   function appendIssueToSprintUI(li, sprintId) {
     const target = Array.from(document.querySelectorAll('details.sprint')).find(el => {

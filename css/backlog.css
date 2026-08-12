@@ -714,6 +714,19 @@ button:disabled, select:disabled, input:disabled {
   .sprint-summary-details h2 {
     font-size: 14px !important;
   }
+  
+  /* Enforce Single-Line Sprint Dates Wrapper style */
+  .sprint-dates-text {
+    font-size: 11px !important;
+  }
+  .sprint-status-wrapper {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+  }
+
   .sprint-summary-actions {
     width: 100%;
     justify-content: space-between;
@@ -726,6 +739,21 @@ button:disabled, select:disabled, input:disabled {
     flex-wrap: wrap !important;
     gap: 8px !important;
   }
+  
+  /* Color-Coded Issue Type Left Borders style */
+  .sprint li[data-id] {
+    border-left: 4px solid #e9dfde !important;
+  }
+  .sprint li:has(.tag[data-type=story]) {
+    border-left: 4px solid #c98a2e !important;
+  }
+  .sprint li:has(.tag[data-type=bug]) {
+    border-left: 4px solid #822f3e !important;
+  }
+  .sprint li:has(.tag[data-type=task]) {
+    border-left: 4px solid #8b94a3 !important;
+  }
+
   .sprint li .tag {
     order: 1;
   }
@@ -748,6 +776,16 @@ button:disabled, select:disabled, input:disabled {
     flex: 1 1 calc(33.33% - 8px);
     height: 28px;
     font-size: 11px;
+  }
+  
+  /* Centered and Clean Mobile Legend style */
+  .legend {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+    background: #faf9f8 !important;
+    padding: 10px !important;
+    border-radius: 6px !important;
   }
 }
 

@@ -136,7 +136,7 @@ html {
   transition: background 0.15s ease;
 }
 .profile-popup .logout-btn:hover {
-  background: rgb(39.2289797275%, 14.1827849784%, 18.7092057162%);
+  background: rgb(100.0338983051, 36.1661016949, 47.7084745763);
 }
 
 @media (max-width: 640px) {
@@ -235,7 +235,7 @@ main {
 .card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border-color: rgb(83.3725490196%, 75.8146167558%, 75.0588235294%);
+  border-color: rgb(212.6, 193.3272727273, 191.4);
 }
 .card:active {
   cursor: grabbing;
@@ -323,9 +323,6 @@ main {
   }
 }
 @media (max-width: 640px) {
-  .navbar {
-    padding: 0 16px;
-  }
   main {
     padding: 24px 16px;
   }

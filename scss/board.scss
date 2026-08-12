@@ -116,7 +116,6 @@ main {
 }
 
 @media (max-width: 640px) {
-  .navbar { padding: 0 16px; }
   main { padding: 24px 16px; }
   .board { grid-template-columns: 1fr; }
   .sprint-head { flex-wrap: wrap; }

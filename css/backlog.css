@@ -407,6 +407,7 @@ main {
   }
   .backlog-header {
     position: relative;
+    justify-content: center;
   }
   .new-item {
     position: static;

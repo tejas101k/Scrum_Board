@@ -326,10 +326,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Handle issue deletion in backlog
+  // Handle click events (deletion, start, complete, edit sprint) on main container
   main.addEventListener('click', (e) => {
-    if (e.target.classList.contains('delete-btn')) {
-      const li = e.target.closest('li');
+    const target = e.target;
+
+    // 1. Issue Deletion Click
+    if (target.classList.contains('delete-btn')) {
+      const li = target.closest('li');
       if (!li || !li.dataset.id) return;
 
       if (confirm('Are you sure you want to delete this issue?')) {
@@ -349,6 +352,176 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error('Delete issue failed:', err);
         });
       }
+      return;
+    }
+
+    // 2. Start Sprint Click
+    if (target.classList.contains('start-sprint-btn')) {
+      e.stopPropagation();
+      e.preventDefault();
+      const sprintEl = target.closest('details.sprint');
+      if (!sprintEl || !sprintEl.dataset.sprintId) return;
+
+      const sprintId = sprintEl.dataset.sprintId;
+      fetch(`/sprints/${sprintId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'In Progress' })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to start sprint');
+        return res.json();
+      })
+      .then(updatedSprint => {
+        const sIdx = sprintsList.findIndex(s => String(s.id) === String(sprintId));
+        if (sIdx !== -1) sprintsList[sIdx] = updatedSprint;
+        
+        const newSprintEl = createSprintElement(updatedSprint);
+        const ul = sprintEl.querySelector('ul');
+        const newUl = newSprintEl.querySelector('ul');
+        if (ul && newUl) {
+          newUl.innerHTML = ul.innerHTML;
+        }
+        
+        sprintEl.replaceWith(newSprintEl);
+        updateSprintIssueCounts();
+      })
+      .catch(err => {
+        alert('Failed to start sprint on server.');
+        console.error('Start sprint error:', err);
+      });
+      return;
+    }
+
+    // 3. Complete Sprint Click
+    if (target.classList.contains('complete-sprint-btn')) {
+      e.stopPropagation();
+      e.preventDefault();
+      const sprintEl = target.closest('details.sprint');
+      if (!sprintEl || !sprintEl.dataset.sprintId) return;
+
+      const sprintId = sprintEl.dataset.sprintId;
+      fetch(`/sprints/${sprintId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Closed' })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to complete sprint');
+        return res.json();
+      })
+      .then(updatedSprint => {
+        const sIdx = sprintsList.findIndex(s => String(s.id) === String(sprintId));
+        if (sIdx !== -1) sprintsList[sIdx] = updatedSprint;
+        
+        const newSprintEl = createSprintElement(updatedSprint);
+        const ul = sprintEl.querySelector('ul');
+        const newUl = newSprintEl.querySelector('ul');
+        if (ul && newUl) {
+          newUl.innerHTML = ul.innerHTML;
+        }
+        
+        sprintEl.replaceWith(newSprintEl);
+        updateSprintIssueCounts();
+      })
+      .catch(err => {
+        alert('Failed to complete sprint on server.');
+        console.error('Complete sprint error:', err);
+      });
+      return;
+    }
+
+    // 4. Toggle Edit Sprint Form Inline
+    if (target.classList.contains('edit-sprint-btn')) {
+      e.stopPropagation();
+      e.preventDefault();
+      const sprintEl = target.closest('details.sprint');
+      if (!sprintEl || !sprintEl.dataset.sprintId) return;
+
+      let existingForm = sprintEl.querySelector('.edit-sprint-form');
+      if (existingForm) {
+        existingForm.remove();
+        return;
+      }
+
+      const sprintId = sprintEl.dataset.sprintId;
+      const sprint = sprintsList.find(s => String(s.id) === String(sprintId));
+      if (!sprint) return;
+
+      const editForm = document.createElement('form');
+      editForm.className = 'edit-sprint-form';
+      editForm.style.cssText = 'padding: 15px 20px; background: #faf9f8; border-bottom: 1px solid #e9dfde; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;';
+      
+      const sDate = sprint.start_date ? new Date(sprint.start_date).toISOString().split('T')[0] : '';
+      const eDate = sprint.end_date ? new Date(sprint.end_date).toISOString().split('T')[0] : '';
+
+      editForm.innerHTML = `
+        <input type="text" class="edit-sprint-name" value="${escapeHTML(sprint.name)}" placeholder="Sprint name" required style="font-size: 13px; padding: 4px 8px; border: 1px solid #e9dfde; border-radius: 4px; height: 30px;">
+        <div style="display: flex; gap: 8px;">
+          <input type="date" class="edit-sprint-start" value="${sDate}" required style="font-size: 12px; padding: 4px; border: 1px solid #e9dfde; border-radius: 4px; flex: 1; height: 30px;">
+          <input type="date" class="edit-sprint-end" value="${eDate}" required style="font-size: 12px; padding: 4px; border: 1px solid #e9dfde; border-radius: 4px; flex: 1; height: 30px;">
+        </div>
+        <textarea class="edit-sprint-goal" placeholder="Goal (optional)" rows="2" style="font-size: 13px; padding: 4px 8px; border: 1px solid #e9dfde; border-radius: 4px; font-family: inherit;">${escapeHTML(sprint.goal || '')}</textarea>
+        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
+          <button type="button" class="cancel-edit-sprint-btn" style="padding: 4px 10px; font-size: 12px; border: 1px solid #e9dfde; background: #fff; border-radius: 4px; cursor: pointer;">Cancel</button>
+          <button type="submit" style="padding: 4px 10px; font-size: 12px; border: none; background: #822f3e; color: #fff; border-radius: 4px; cursor: pointer; font-weight: bold;">Save</button>
+        </div>
+      `;
+
+      editForm.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+      });
+
+      editForm.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        const name = editForm.querySelector('.edit-sprint-name').value.trim();
+        const start = editForm.querySelector('.edit-sprint-start').value;
+        const end = editForm.querySelector('.edit-sprint-end').value;
+        const goal = editForm.querySelector('.edit-sprint-goal').value.trim();
+
+        if (!name || !start || !end) return;
+
+        fetch(`/sprints/${sprintId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, start_date: start, end_date: end, goal })
+        })
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to update sprint');
+          return res.json();
+        })
+        .then(updatedSprint => {
+          const sIdx = sprintsList.findIndex(s => String(s.id) === String(sprintId));
+          if (sIdx !== -1) sprintsList[sIdx] = updatedSprint;
+
+          const tempEl = createSprintElement(updatedSprint);
+          const summary = sprintEl.querySelector('summary');
+          const newSummary = tempEl.querySelector('summary');
+          if (summary && newSummary) {
+            summary.innerHTML = newSummary.innerHTML;
+          }
+          editForm.remove();
+        })
+        .catch(err => {
+          alert('Failed to save sprint changes on server.');
+          console.error('Save sprint edit error:', err);
+        });
+      });
+
+      const ul = sprintEl.querySelector('ul');
+      sprintEl.insertBefore(editForm, ul);
+      return;
+    }
+
+    // 5. Cancel Sprint Edit Form Inline
+    if (target.classList.contains('cancel-edit-sprint-btn')) {
+      e.stopPropagation();
+      e.preventDefault();
+      const form = target.closest('.edit-sprint-form');
+      if (form) form.remove();
+      return;
     }
   });
 
@@ -499,17 +672,51 @@ document.addEventListener('DOMContentLoaded', () => {
     details.className = 'sprint';
     details.open = true;
     details.dataset.sprintId = sprint.id;
+    details.dataset.sprintStatus = sprint.status || 'Created';
 
     const dates = sprint.start_date && sprint.end_date ? `${formatDate(sprint.start_date)} – ${formatDate(sprint.end_date)}` : 'No dates';
+    
+    let statusText = sprint.status || 'Created';
+    let statusHTML = `<span class="sprint-status-badge" style="font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; background: #e9dfde; color: #555;">${statusText}</span>`;
+    if (statusText === 'In Progress') {
+      statusHTML = `<span class="sprint-status-badge" style="font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; background: #faf0ed; color: #822f3e;">Active</span>`;
+    } else if (statusText === 'Closed') {
+      statusHTML = `<span class="sprint-status-badge" style="font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; background: #eaeaea; color: #7f8c8d;">Closed</span>`;
+    }
+
+    let actionButtonsHTML = '';
+    if (statusText === 'Created') {
+      actionButtonsHTML = `
+        <button class="start-sprint-btn" style="padding: 4px 8px; font-size: 12px; border: none; background: #822f3e; color: #fff; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 10px;">Start</button>
+        <button class="edit-sprint-btn" style="padding: 4px 8px; font-size: 12px; border: 1px solid #e9dfde; background: #fff; color: #333; border-radius: 4px; cursor: pointer; margin-left: 5px;">Edit</button>
+      `;
+    } else if (statusText === 'In Progress') {
+      actionButtonsHTML = `
+        <button class="complete-sprint-btn" style="padding: 4px 8px; font-size: 12px; border: none; background: #27ae60; color: #fff; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 10px;">Complete</button>
+        <button class="edit-sprint-btn" style="padding: 4px 8px; font-size: 12px; border: 1px solid #e9dfde; background: #fff; color: #333; border-radius: 4px; cursor: pointer; margin-left: 5px;">Edit</button>
+      `;
+    } else if (statusText === 'Closed') {
+      actionButtonsHTML = `
+        <span style="font-size: 12px; color: #7f8c8d; margin-left: 10px; font-style: italic;">Completed</span>
+      `;
+    }
+
     details.innerHTML = `
-      <summary>
-        <span class="no">Sprint ${sprint.id}</span>
-        <div>
-          <h2>${escapeHTML(sprint.name)}</h2>
-          <p><em>Active</em> ${dates}</p>
-          ${sprint.goal ? `<p class="goal">${escapeHTML(sprint.goal)}</p>` : ''}
+      <summary style="display: flex; align-items: center; justify-content: space-between; padding: 10px 20px;">
+        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
+          <span class="no" style="font-weight: bold;">Sprint ${sprint.id}</span>
+          <div style="flex: 1;">
+            <h2 class="sprint-title-text" style="font-size: 15px; font-weight: 700; margin: 0; color: #822f3e;">${escapeHTML(sprint.name)}</h2>
+            <p style="margin: 2px 0 0 0; font-size: 12px; color: #7f8c8d;">
+              <em>${statusHTML}</em> <span class="sprint-dates-text">${dates}</span>
+            </p>
+            ${sprint.goal ? `<p class="goal sprint-goal-text" style="margin: 4px 0 0 0; font-size: 12px; color: #555;">${escapeHTML(sprint.goal)}</p>` : '<p class="goal sprint-goal-text" style="margin: 4px 0 0 0; font-size: 12px; color: #555; display: none;"></p>'}
+          </div>
         </div>
-        <span class="count">0 issues</span>
+        <div style="display: flex; align-items: center; gap: 10px;" class="sprint-summary-actions">
+          ${actionButtonsHTML}
+          <span class="count" style="font-size: 12px; color: #7f8c8d;">0 issues</span>
+        </div>
       </summary>
       <ul></ul>
     `;

@@ -293,7 +293,7 @@ app.post('/sprints', requireAuth, async (req, res) => {
 
 // Update sprint
 app.put('/sprints/:id', requireAuth, async (req, res) => {
-  const { name, start_date, end_date, goal } = req.body;
+  const { name, start_date, end_date, goal, status } = req.body;
   try {
     const fields = [];
     const values = [];
@@ -303,6 +303,13 @@ app.put('/sprints/:id', requireAuth, async (req, res) => {
     if (start_date !== undefined) { fields.push(`start_date = $${i++}`); values.push(start_date); }
     if (end_date !== undefined) { fields.push(`end_date = $${i++}`); values.push(end_date); }
     if (goal !== undefined) { fields.push(`goal = $${i++}`); values.push(goal); }
+    if (status !== undefined) {
+      if (!['Created', 'In Progress', 'Closed'].includes(status)) {
+        return res.status(400).json({ error: 'Invalid sprint status' });
+      }
+      fields.push(`status = $${i++}`);
+      values.push(status);
+    }
 
     if (fields.length === 0) return res.status(400).json({ error: 'No fields' });
 
@@ -338,9 +345,13 @@ async function startServer() {
         name VARCHAR(255) NOT NULL,
         start_date VARCHAR(50) NOT NULL,
         end_date VARCHAR(50) NOT NULL,
-        goal TEXT
+        goal TEXT,
+        status VARCHAR(50) NOT NULL DEFAULT 'Created'
       )
     `);
+    await pool.query(`
+      ALTER TABLE sprints ADD COLUMN IF NOT EXISTS status VARCHAR(50) NOT NULL DEFAULT 'Created'
+    `).catch(() => {});
     await pool.query(`
       CREATE TABLE IF NOT EXISTS tasks (
         id SERIAL PRIMARY KEY,

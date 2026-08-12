@@ -80,7 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ])
     .then(([sprints, tasks]) => {
       if (headingEl) {
-        headingEl.textContent = `Active Sprints: ${sprints.length}`;
+        const activeCount = sprints.filter(s => s.status === 'In Progress').length;
+        headingEl.textContent = `Active Sprints: ${activeCount}`;
       }
 
       if (sprints.length === 0) {
@@ -96,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!str) return '';
         const date = new Date(str);
         if (isNaN(date.getTime())) return str;
-        const months = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
         const m = date.getMonth();
         const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         return `${date.getDate()} ${shortMonths[m]}`;
@@ -113,6 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
           ? `${formatDate(sprint.start_date)} – ${formatDate(sprint.end_date)}` 
           : 'No dates';
 
+        let statusLabel = sprint.status || 'Created';
+        if (statusLabel === 'In Progress') {
+          statusLabel = 'Active';
+        }
+
         // 1. Sprint number
         const numEl = document.createElement('div');
         numEl.className = 'sprint_number';
@@ -123,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const detailsEl = document.createElement('div');
         detailsEl.innerHTML = `
           <h2>${escapeHTML(sprint.name)}</h2>
-          <p><em>Active</em> <span class="sprint-date">${escapeHTML(datesText)}</span></p>
+          <p><em>${statusLabel}</em> <span class="sprint-date">${escapeHTML(datesText)}</span></p>
           ${sprint.goal ? `
           <details class="goal-details" ${window.innerWidth > 640 ? 'open' : ''}>
             <summary>Description</summary>

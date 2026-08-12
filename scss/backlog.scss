@@ -192,8 +192,387 @@ main {
   .navbar { padding: 0 16px; }
   main { padding: 32px 16px; }
 
-  .new-item form { width: 100%; left: 0; }
+  .backlog-header {
+    position: relative;
+  }
+  .new-item {
+    position: static;
+  }
+  .new-item form {
+    width: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+  }
 
   .sprint li { flex-wrap: wrap; }
   .title { flex: 1 0 100%; order: -1; }
+}
+
+.sprint-status-badge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  background: #e9dfde;
+  color: #555;
+}
+.active-sprint-badge {
+  background: #faf0ed;
+  color: #822f3e;
+}
+.closed-sprint-badge {
+  background: #eaeaea;
+  color: #7f8c8d;
+}
+.start-sprint-btn, .complete-sprint-btn, .edit-sprint-btn {
+  padding: 4px 8px;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+.start-sprint-btn {
+  background: #822f3e;
+  color: #fff;
+  font-weight: bold;
+}
+.complete-sprint-btn {
+  background: #27ae60;
+  color: #fff;
+  font-weight: bold;
+}
+.edit-sprint-btn {
+  border: 1px solid #e9dfde;
+  background: #fff;
+  color: #333;
+}
+.completed-label {
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-left: 10px;
+  font-style: italic;
+}
+.sprint-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+.sprint-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+.sprint-summary-left .no {
+  font-weight: bold;
+}
+.sprint-summary-details {
+  flex: 1;
+}
+.sprint-summary-details h2 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+  color: #822f3e;
+}
+.sprint-summary-details p {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #7f8c8d;
+}
+.sprint-summary-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.edit-sprint-form {
+  padding: 15px 20px;
+  background: #faf9f8;
+  border-bottom: 1px solid #e9dfde;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.edit-sprint-form input, .edit-sprint-form textarea {
+  border: 1px solid #e9dfde;
+  border-radius: 4px;
+  font-family: inherit;
+}
+.edit-sprint-form input[type="text"] {
+  font-size: 13px;
+  padding: 4px 8px;
+  height: 30px;
+}
+.edit-sprint-form .form-row {
+  display: flex;
+  gap: 8px;
+}
+.edit-sprint-form input[type="date"] {
+  font-size: 12px;
+  padding: 4px;
+  flex: 1;
+  height: 30px;
+}
+.edit-sprint-form textarea {
+  font-size: 13px;
+  padding: 4px 8px;
+}
+.edit-sprint-form .form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.cancel-edit-sprint-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid #e9dfde;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.save-edit-sprint-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  border: none;
+  background: #822f3e;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.backlog-drag-over {
+  border-top: 2px solid #822f3e !important;
+}
+.backlog-dragging {
+  opacity: 0.5;
+}
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  font-family: inherit;
+}
+.user-meta .user-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: #822f3e;
+}
+.user-meta .user-role {
+  font-size: 10px;
+  color: #7f8c8d;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.profile-popup .profile-role {
+  font-size: 11px;
+  color: #822f3e;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  text-align: center;
+}
+.profile-popup .profile-email {
+  margin-bottom: 12px;
+  text-align: center;
+}
+.hidden {
+  display: none !important;
+}
+
+/* Labeled Forms Layout Rules */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.form-group label {
+  font-size: 11px;
+  font-weight: bold;
+  color: #822f3e;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
+}
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+.flex-1 {
+  flex: 1;
+}
+
+/* Backlog Column Headers Row Rules */
+.backlog-row-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px;
+  background: #faf9f8;
+  border-bottom: 1px solid #e9dfde;
+  font-size: 11px;
+  font-weight: 700;
+  color: #8a7b7f;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.backlog-row-header span:not(.title-header) {
+  flex-shrink: 0;
+}
+.sprint li select, .sprint li input, .sprint li button {
+  flex-shrink: 0;
+}
+.sprint li .delete-btn {
+  width: 24px;
+  text-align: center;
+  padding: 0;
+}
+.backlog-row-header .tag-spacer {
+  width: 20px;
+  flex-shrink: 0;
+}
+.backlog-row-header .title-header {
+  flex: 1;
+  text-align: left;
+}
+.backlog-row-header .sprint-header {
+  width: 90px;
+  flex-shrink: 0;
+  text-align: left;
+}
+.backlog-row-header .priority-header {
+  width: 85px;
+  flex-shrink: 0;
+  text-align: left;
+}
+.backlog-row-header .assignee-header {
+  width: 110px;
+  flex-shrink: 0;
+  text-align: left;
+}
+.backlog-row-header .points-header {
+  width: 46px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.backlog-row-header .status-header {
+  width: 110px;
+  flex-shrink: 0;
+  text-align: left;
+}
+.backlog-row-header .action-spacer {
+  width: 24px;
+  flex-shrink: 0;
+}
+
+/* Double-submission button disable protection style */
+button:disabled, select:disabled, input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Responsive Mobile Layout Polishes */
+@media (max-width: 640px) {
+  .backlog-row-header {
+    display: none !important;
+  }
+  .sprint-summary-header {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 16px !important;
+  }
+  .sprint summary .no {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 11px !important;
+    line-height: 48px !important;
+  }
+  .sprint-summary-left {
+    gap: 10px !important;
+    width: 100%;
+  }
+  .sprint-summary-details h2 {
+    font-size: 14px !important;
+  }
+  
+  /* Enforce Single-Line Sprint Dates Wrapper style */
+  .sprint-dates-text {
+    font-size: 11px !important;
+  }
+  .sprint-status-wrapper {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+  }
+
+  .sprint-summary-actions {
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px solid #e9dfde;
+    padding-top: 8px;
+    margin-left: 0 !important;
+  }
+  .sprint li {
+    padding: 12px 16px !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  
+  /* Color-Coded Issue Type Left Borders style */
+  .sprint li[data-id] {
+    border-left: 4px solid #e9dfde !important;
+  }
+  .sprint li:has(.tag[data-type=story]) {
+    border-left: 4px solid #c98a2e !important;
+  }
+  .sprint li:has(.tag[data-type=bug]) {
+    border-left: 4px solid #822f3e !important;
+  }
+  .sprint li:has(.tag[data-type=task]) {
+    border-left: 4px solid #8b94a3 !important;
+  }
+
+  .sprint li .tag {
+    order: 1;
+  }
+  .sprint li .title {
+    flex: 1 1 auto;
+    order: 2;
+    font-size: 14px;
+  }
+  .sprint li .delete-btn {
+    order: 3;
+    margin-left: auto;
+  }
+  .sprint li select.issue-sprint,
+  .sprint li select.priority,
+  .sprint li select.who,
+  .sprint li input.points,
+  .sprint li select.status {
+    order: 4;
+    width: calc(33.33% - 8px) !important;
+    flex: 1 1 calc(33.33% - 8px);
+    height: 28px;
+    font-size: 11px;
+  }
+  
+  /* Centered and Clean Mobile Legend style */
+  .legend {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+    background: #faf9f8 !important;
+    padding: 10px !important;
+    border-radius: 6px !important;
+  }
 }

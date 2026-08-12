@@ -3,6 +3,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const sprintForm = document.querySelector('.backlog-header details:nth-of-type(1) form');
   const issueForm = document.querySelector('.backlog-header details:nth-of-type(2) form');
 
+  // Ensure only one backlog header details dropdown is open at a time
+  const newItems = document.querySelectorAll('.backlog-header details.new-item');
+  newItems.forEach(details => {
+    details.addEventListener('toggle', () => {
+      if (details.open) {
+        newItems.forEach(other => {
+          if (other !== details) {
+            other.removeAttribute('open');
+          }
+        });
+      }
+    });
+  });
+
   let sprintsList = [];
   let usersList = [];
 

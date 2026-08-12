@@ -171,6 +171,13 @@ app.post('/tasks', requireAuth, async (req, res) => {
   }
 
   try {
+    if (sprint_id) {
+      const sprintCheck = await pool.query('SELECT status FROM sprints WHERE id = $1', [sprint_id]);
+      if (sprintCheck.rows.length > 0 && sprintCheck.rows[0].status === 'Closed') {
+        return res.status(400).json({ error: 'Cannot assign an issue to a closed sprint.' });
+      }
+    }
+
     const nextPosRes = await pool.query('SELECT COALESCE(MAX(position), 0) AS max_pos FROM tasks WHERE sprint_id IS NULL');
     const nextPos = nextPosRes.rows[0].max_pos + 1;
 
@@ -269,6 +276,13 @@ app.put('/tasks/:id', requireAuth, async (req, res) => {
     if (assignee_id !== undefined) { fields.push(`assignee_id = $${i++}`); values.push(assignee_id ? parseInt(assignee_id) : null); }
     if (story_points !== undefined) { fields.push(`story_points = $${i++}`); values.push(story_points ? parseInt(story_points) : 0); }
     if (sprint_id !== undefined) {
+      if (sprint_id !== null) {
+        const sprintCheck = await pool.query('SELECT status FROM sprints WHERE id = $1', [sprint_id]);
+        if (sprintCheck.rows.length > 0 && sprintCheck.rows[0].status === 'Closed') {
+          return res.status(400).json({ error: 'Cannot assign an issue to a closed sprint.' });
+        }
+      }
+
       fields.push(`sprint_id = $${i++}`);
       values.push(sprint_id ? parseInt(sprint_id) : null);
 
@@ -334,14 +348,24 @@ app.get('/sprints/:id', requireAuth, async (req, res) => {
 // Create sprint
 app.post('/sprints', requireAuth, async (req, res) => {
   const { name, start_date, end_date, goal } = req.body;
-  if (!name || !start_date || !end_date) {
-    return res.status(400).json({ error: 'Name, start date, and end date are required' });
+  if (!name || typeof name !== 'string' || !name.trim()) {
+    return res.status(400).json({ error: 'Sprint name is required and must be a non-empty string' });
   }
+  if (!start_date || !end_date) {
+    return res.status(400).json({ error: 'Start date and end date are required' });
+  }
+  if (isNaN(Date.parse(start_date)) || isNaN(Date.parse(end_date))) {
+    return res.status(400).json({ error: 'Invalid date formats provided' });
+  }
+  if (new Date(end_date) < new Date(start_date)) {
+    return res.status(400).json({ error: 'End date must not be before start date' });
+  }
+
   try {
     const { rows } = await pool.query(
       `INSERT INTO sprints (name, start_date, end_date, goal)
        VALUES ($1, $2, $3, $4) RETURNING *`,
-      [name, start_date, end_date, goal || '']
+      [name.trim(), start_date, end_date, goal ? goal.trim() : '']
     );
     res.status(201).json(rows[0]);
   } catch (err) {
